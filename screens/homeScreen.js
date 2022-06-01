@@ -101,19 +101,7 @@ export default function HomeScreen({total,setTotal}) {
                 </TouchableOpacity>
             </View>
         }} />
-        <View style={styles.scrol}>
-
-            <TouchableOpacity style={styles.call}>
-                <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.panier}>
-                <Icon as={Ionicons} name="cart"  size={5}/>
-                <Text style={{fontSize:12,fontWeight:'900',margin:8}}>Panier : {total} DHs</Text>
-            </TouchableOpacity>
-
-        </View>
+        
         </NativeBaseProvider>
     </View>
 }
