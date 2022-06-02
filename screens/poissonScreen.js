@@ -1,7 +1,11 @@
 import * as React from 'react';
 import { View, Text, Button, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { NativeBaseProvider,Icon } from 'native-base';
+import { Ionicons } from '@expo/vector-icons';
+import { BackHandler } from 'react-native';
+import { storeData } from './dataFunctions';
 
-export default function PoissonsScreen({ total,setTotal,All, setAll }) {
+export default function PoissonsScreen({navigation,route}) {
     const [Poissons, setPoissons] = React.useState([
         { name: 'Calamar', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
         { name: 'Crevettes', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
@@ -13,10 +17,74 @@ export default function PoissonsScreen({ total,setTotal,All, setAll }) {
 
     ])
     const ways = ['Frit', 'Plancha', 'Sauce Ajio', 'Sauce Regamonte']
-    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <FlatList data={Poissons} renderItem={({ item, index }) => {
+    const [totalP,setTotalP]=React.useState(0)
+    const [totalE,setTotalE]=React.useState(0)
+    const [totalB,setTotalB]=React.useState(0)
+    const [totalD,setTotalD]=React.useState(0)
+    const [firsVisit,setFirstVisit]=React.useState(true)
+    
+    React.useEffect(()=>{
+        storeData('Poissons',{data:Poissons})
+        },[Poissons])
+    
+    React.useEffect(()=>{
+        if(!firsVisit){storeData('totalP',{data:totalP})}
+        },[totalP])
 
-            return <View style={[styles.btn,{height:380, margin: 25,justifyContent:'flex-start'}]}>
+
+        React.useEffect(() => {
+            const backAction = () => {
+                navigation.navigate('Home',{totalP})
+                return true;
+            };
+        
+            const backHandler = BackHandler.addEventListener(
+              "hardwareBackPress",
+              backAction 
+            );
+        
+            return () => backHandler.remove();
+          }, [])
+
+    React.useEffect(()=>{
+        setFirstVisit(false)
+        async function getData(){
+            try {
+                await AsyncStorage.getItem('totalE').then((value)=>{
+                    if (value){
+                        console.log(JSON.parse(value))
+                        setTotalE(JSON.parse(value).data)
+                        }
+                })
+            await AsyncStorage.getItem('totalB').then((value)=>{
+                if (value){
+                    console.log(JSON.parse(value))
+                    setTotalB(JSON.parse(value).data)
+                    }
+            })
+            await AsyncStorage.getItem('totalD').then((value)=>{
+                if (value){
+                    console.log(JSON.parse(value))
+                    setTotalD(JSON.parse(value).data)
+                    }
+            })
+            await AsyncStorage.getItem('totalP').then((value)=>{
+                if (value){
+                    console.log(JSON.parse(value))
+                    setTotalP(JSON.parse(value).data)
+                    }
+            })
+            return null
+            } catch(e) {
+            }
+        }
+        
+        getData()},[])
+    
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <FlatList data={Poissons}  renderItem={({ item, index }) => {
+
+            return <View><View style={[styles.btn,{height:380, margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
                     <View>
                         <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.pic} />
@@ -28,14 +96,17 @@ export default function PoissonsScreen({ total,setTotal,All, setAll }) {
                             <Text style={styles.title}>{item.name}</Text>
                             <TouchableOpacity onPress={() => {
                                 let x =[...Poissons]
-                                x[index].quantity = x[index].quantity + 0.25
+
+                                x[index].quantity = x[index].quantity + 0.250
+                                storeData('totalP',{data:totalP+x[index].unitPrice*0.250})
+                                setTotalP(totalP+x[index].unitPrice*0.250)
                                 setPoissons(x)
-                                setTotal(total+x[index].unitPrice*0.25)
                             }} style={{ backgroundColor: '#00cc00', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>+</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
                                 let x = [ ...Poissons] 
+                                if (x[index].quantity>0){setTotalP(totalP-x[index].unitPrice*0.250)}
                                 x[index].quantity = Number(Math.max(x[index].quantity - 0.250, 0))
                                 setPoissons(x)
                             }} style={{ backgroundColor: 'red', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
@@ -79,8 +150,31 @@ export default function PoissonsScreen({ total,setTotal,All, setAll }) {
                     </TouchableOpacity>
                 </View>
             </View>
+            
+        
+        </View>
+        {index===Poissons.length-1?<View style={{height:60}}></View>:null}
         </View>
         }} />
+        
+        <NativeBaseProvider>
+
+        <View style={styles.scrol}>
+
+            <TouchableOpacity style={[styles.call,{margin:25}]}>
+                <Icon as={Ionicons} color='black' name="call" size={5}/>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity style={styles.panier} onPress={()=>{
+                    navigation.navigate('panier')
+                }}>
+                <Icon as={Ionicons} name="cart"  size={5}/>
+                <Text style={{fontSize:12,fontWeight:'900',margin:8}}>{(totalB+totalD+totalE+totalP)>0?(totalB+totalD+totalE+totalP).toString()+ 'DHs':'Panier'} </Text>
+            </TouchableOpacity> */}
+
+            </View>
+    </NativeBaseProvider>
     </View>
 }
 const styles = StyleSheet.create({
@@ -123,8 +217,8 @@ const styles = StyleSheet.create({
 
     }, scrol: {
         flexDirection: 'row-reverse',
-        justifyContent: 'space-between',
-        marginBottom: 18
+        justifyContent:'space-between',
+        height:0
     },
     call: {
         width: 170,

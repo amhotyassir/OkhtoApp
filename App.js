@@ -1,80 +1,83 @@
 import * as React from 'react';
-import { View, Text, Button,StyleSheet,TouchableOpacity} from 'react-native';
+import { View, Text, Button,StyleSheet,TouchableOpacity,FlatList} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as NavigationBar from 'expo-navigation-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeBaseProvider, Icon } from 'native-base';
 // import * as NavigationBar from 'expo-navigation-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-import PoissonsScreen from './screens/poissonScreen';
+import PoissonsScreen from './screens/poissonScreen'
 import EntreesScreen from './screens/entreesScreen';
 import BoissonsScreen from './screens/BoissonScreen';
 import DessertScreen from './screens/dessertScreen';
 import HomeScreen from './screens/homeScreen';
+import Panier from './screens/panier';
+import { storeData } from './screens/dataFunctions';
+
 
 const Stack = createStackNavigator();
+
+function ScreenP ({navigation,route}){return<PoissonsScreen navigation={navigation}  />}
+function ScreenB ({navigation,route}){return<BoissonsScreen   navigation={navigation}  />}
+function ScreenD ({navigation,route}){return<DessertScreen   navigation={navigation}  />}
+function ScreenE ({navigation,route}){return<EntreesScreen   navigation={navigation}  />}
+function Ppanier({navigation,route}){ return <Panier navigation={navigation} />}
+function Home({navigation,route}){ return <HomeScreen navigation={navigation} />}
+
 function App() {
-  global.ref = React.useRef(null);
-  const [All,setAll]=React.useState({
-    Poissons:[
-      {name:'Calamar',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-      {name:'Crevettes',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-      {name:'Sol',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-      {name:'Pescadia',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-      {name:'Borasi',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-      {name:'Rapi',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-      {name:'Salmonete',quantity:0,unitPrice:140,way:'',pic:require('./screens/types/calamar.jpg')},
-     
-    ],Entrees:[
-      {name:'Salade (p)',quantity:0,unitPrice:30,way:'',pic:require('./screens/types/calamar.jpg')},
-    ],Boissons:[
-    {name:'Jus ',quantity:0,unitPrice:15,way:'',pic:require('./screens/types/calamar.jpg')},
-  ],Dessert:[
-    {name:'Flan',quantity:0,unitPrice:10,way:'',pic:require('./screens/types/calamar.jpg')},
-  ]
-})
-  const [total,setTotal]=React.useState(0)
-  // let xx=All.map((arr)=>{
-  //   let x=0
-  //   smm=arr.map((obj)=>{
-  //     x=x+obj.unitPrice*obj.quantity
-  //     return null
-  //   })
-  //   total=total+x
-  //   return null
-  // })
+
+    React.useEffect(()=>{
+        storeData('All',{Poissons:[
+            { name: 'Calamar', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+            { name: 'Crevettes', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+            { name: 'Sol', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+            { name: 'Pescadia', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+            { name: 'Borasi', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+            { name: 'Rapi', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+            { name: 'Rougi', quantity: 0, unitPrice: 140, way: '', pic: require('./screens/types/calamar.jpg') },
+        
+        ],Boissons:[
+            { name: 'Jus', quantity: 0, unitPrice: 20, pic: require('./pics/boissons.jpeg') },
+
+        ],Entrees:[
+            { name: 'Salade', quantity: 0, unitPrice: 20, pic: require('./pics/entrées.jpg') },
+
+        ],Dessert:[
+            { name: 'Flan', quantity: 0, unitPrice: 20, pic: require('./pics/dessert.jpg') },
+
+        ]
+
+    })
+        storeData('totalP',{data:0})
+        storeData('totalD',{data:0})
+        storeData('totalB',{data:0})
+        storeData('totalE',{data:0})
+        
+        },[])
+    
 
   NavigationBar.setVisibilityAsync('hidden')
+  const ref=React.useRef(null)
   return (<NativeBaseProvider>
     <View style={{ flex: 1 }}>
       <NavigationContainer ref={ref}>
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen name="Home" options={{ headerTitle: '',
           headerBackTitle:false,
-          headerTransparent:true }} component={()=><HomeScreen  />} />
-          <Stack.Screen name="Poissons" component={()=><PoissonsScreen total={total} setTotal={setTotal}  All={All} setAll={setAll} />} />
-          <Stack.Screen name="Entrées" component={()=><EntreesScreen  All={All} setAll={setAll}  />} />
-          <Stack.Screen name="Boissons" component={()=><BoissonsScreen   All={All} setAll={setAll}  />} />
-          
-          <Stack.Screen name="Dessert" component={()=><DessertScreen   All={All} setAll={setAll} />} />
+          headerTransparent:true }} component={Home} />
+          <Stack.Screen name="Poissons"  component={ScreenP} />
+          <Stack.Screen name="Entrées" component={ScreenE} />
+          <Stack.Screen name="Boissons" component={ScreenB} />
+            <Stack.Screen name="Dessert" component={ScreenD} />
+            <Stack.Screen name="panier" component={Ppanier} />
+
           
         </Stack.Navigator>
       </NavigationContainer>
     </View>
-    <View style={styles.scrol}>
-
-            <TouchableOpacity style={styles.call}>
-                <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.panier}>
-                <Icon as={Ionicons} name="cart"  size={5}/>
-                <Text style={{fontSize:12,fontWeight:'900',margin:8}}>Panier : {total} DHs</Text>
-            </TouchableOpacity>
-
-        </View>
+    
   </NativeBaseProvider>
   );
 }
@@ -122,6 +125,8 @@ const styles = StyleSheet.create({
       flexDirection:'row',
       alignSelf:'flex-end',
       borderWidth:0.65,
+      
+    //   fontFamily:'AbrilFatface-Regular',
       borderColor:'#577557',
       
       shadowColor: "#000",

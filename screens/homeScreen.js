@@ -2,18 +2,59 @@ import * as React from 'react';
 import { View, ScrollView, Text, TouchableOpacity, Image, StyleSheet, FlatList, ImageBackground, StatusBar } from 'react-native';
 import { NativeBaseProvider, Icon } from 'native-base';
 import * as NavigationBar from 'expo-navigation-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function HomeScreen({total,setTotal}) {
+export default function HomeScreen({navigation,route}) {
     NavigationBar.setVisibilityAsync('hidden')
-   const [first,setFirst]=React.useState(true)
+    
 
 //    if (first){
 //     var font = require('font');
 //     font.loadFont('../assests/NexaBold.ttf')
 //     setFirst(false)
 //    }
-    
+const [Poissons,setPoissons]=React.useState(null)
+const [totalP,setTotalP]=React.useState(0)
+const [totalE,setTotalE]=React.useState(0)
+const [totalB,setTotalB]=React.useState(0)
+const [totalD,setTotalD]=React.useState(0)
+
+React.useEffect(()=>{
+    async function getData(){
+        try {
+            await AsyncStorage.getItem('All').then((value)=>{
+                if (value){
+                    setPoissons(JSON.parse(value).Poissons)
+                    }
+            })
+            await AsyncStorage.getItem('totalE').then((value)=>{
+                if (value){
+                    setTotalE(JSON.parse(value).data)
+                    }
+            })
+        await AsyncStorage.getItem('totalB').then((value)=>{
+            if (value){
+                setTotalB(JSON.parse(value).data)
+                }
+        })
+        await AsyncStorage.getItem('totalD').then((value)=>{
+            if (value){
+                setTotalD(JSON.parse(value).data)
+                }
+        })
+        await AsyncStorage.getItem('totalP').then((value)=>{
+            if (value){
+                setTotalP(JSON.parse(value).data)
+                }
+        })
+        return null
+        } catch(e) {
+        console.log(e)
+        }
+        
+    }
+    getData()},[])
     const titles = [
         {
             key: 0,
@@ -33,7 +74,7 @@ export default function HomeScreen({total,setTotal}) {
         },
 
     ]
-
+    // console.log(Poissons)
     return <View style={{ flex: 1, justifyContent: "center" }}>
 <NativeBaseProvider>
         <View style={{ marginBottom: 0, marginTop: StatusBar.currentHeight ,}}>
@@ -50,7 +91,6 @@ export default function HomeScreen({total,setTotal}) {
                     fontSize: 25,
                     position: "absolute",
                     marginTop: 85,
-                    // fontFamily:'Nexa'
                     
                 }}>
                     AL-Okhtobout
@@ -89,7 +129,7 @@ export default function HomeScreen({total,setTotal}) {
 
                 </View>
                 <TouchableOpacity onPress={() => {
-                    ref.current && ref.current.navigate(item.title)
+                    navigation.navigate(item.title)
                 }}  >
                     
                         <View style={styles.btnImg} >
@@ -103,6 +143,21 @@ export default function HomeScreen({total,setTotal}) {
         }} />
         
         </NativeBaseProvider>
+        <View style={styles.scrol}>
+
+            <TouchableOpacity style={[styles.call,{margin:25}]}>
+                <Icon as={Ionicons} color='black' name="call" size={5}/>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity style={styles.panier} onPress={()=>{
+                    navigation.navigate('panier')
+                }}>
+                <Icon as={Ionicons} name="cart"  size={5}/>
+                <Text style={{fontSize:12,fontWeight:'900',margin:8}}>{(totalB+totalD+totalE+totalP)>0?(totalB+totalD+totalE+totalP).toString()+ 'DHs':'Panier'} </Text>
+            </TouchableOpacity> */}
+
+        </View>
     </View>
 }
 const styles = StyleSheet.create({
@@ -146,7 +201,8 @@ const styles = StyleSheet.create({
         position: "absolute",
         marginTop: 85,
         marginLeft:10,
-        width:"100%"
+        width:"100%",
+        fontFamily:'AbrilFatface-Regular'
     },
     
     btn: {
@@ -191,7 +247,7 @@ const styles = StyleSheet.create({
     },scrol: {
         flexDirection: 'row-reverse',
         justifyContent:'space-between',
-        marginBottom:18
+        height:0
     },
     call:{
         width:170,
