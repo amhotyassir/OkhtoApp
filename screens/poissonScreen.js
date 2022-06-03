@@ -1,88 +1,75 @@
 import * as React from 'react';
-import { View, Text, Button, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, Image, TouchableOpacity ,ActivityIndicator} from 'react-native';
 import { NativeBaseProvider,Icon } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import { BackHandler } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { calls } from '../call';
+
 import { storeData } from './dataFunctions';
 
 export default function PoissonsScreen({navigation,route}) {
-    const [Poissons, setPoissons] = React.useState([
-        { name: 'Calamar', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-        { name: 'Crevettes', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-        { name: 'Sol', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-        { name: 'Pescadia', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-        { name: 'Borasi', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-        { name: 'Rapi', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-        { name: 'Rougi', quantity: 0, unitPrice: 140, way: '', pic: require('./types/calamar.jpg') },
-
-    ])
+    const [All, setAll] = React.useState(null)
     const ways = ['Frit', 'Plancha', 'Sauce Ajio', 'Sauce Regamonte']
     const [totalP,setTotalP]=React.useState(0)
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
     const [totalD,setTotalD]=React.useState(0)
-    const [firsVisit,setFirstVisit]=React.useState(true)
+    // const [firsVisit,setFirstVisit]=React.useState(true)
     
-    React.useEffect(()=>{
-        storeData('Poissons',{data:Poissons})
-        },[Poissons])
-    
-    React.useEffect(()=>{
-        if(!firsVisit){storeData('totalP',{data:totalP})}
-        },[totalP])
+   
 
-
-        React.useEffect(() => {
-            const backAction = () => {
-                navigation.navigate('Home',{totalP})
-                return true;
-            };
-        
-            const backHandler = BackHandler.addEventListener(
-              "hardwareBackPress",
-              backAction 
-            );
-        
-            return () => backHandler.remove();
-          }, [])
+      
 
     React.useEffect(()=>{
-        setFirstVisit(false)
+        // console.log('again')
         async function getData(){
             try {
+                await AsyncStorage.getItem('All').then((value)=>{
+                    // console.log(JSON.parse(value).Poissons)
+                    if (value){
+                        // console.log(JSON.parse(value))
+                        setAll(JSON.parse(value))
+                        }
+                })
                 await AsyncStorage.getItem('totalE').then((value)=>{
                     if (value){
-                        console.log(JSON.parse(value))
+                        // console.log(JSON.parse(value))
                         setTotalE(JSON.parse(value).data)
                         }
                 })
             await AsyncStorage.getItem('totalB').then((value)=>{
                 if (value){
-                    console.log(JSON.parse(value))
+                    // console.log(JSON.parse(value))
                     setTotalB(JSON.parse(value).data)
                     }
             })
             await AsyncStorage.getItem('totalD').then((value)=>{
                 if (value){
-                    console.log(JSON.parse(value))
+                    // console.log(JSON.parse(value))
                     setTotalD(JSON.parse(value).data)
                     }
             })
             await AsyncStorage.getItem('totalP').then((value)=>{
                 if (value){
-                    console.log(JSON.parse(value))
+                    // console.log(JSON.parse(value))
                     setTotalP(JSON.parse(value).data)
                     }
             })
             return null
             } catch(e) {
+                console.log(e)
             }
         }
-        
+        // console.log('Done')
         getData()},[])
-    
+    if (!All){
+        // console.log(All)
+        return  <View style={[styles.container, styles.horizontal]}>
+        <ActivityIndicator size="large" color="#00ff00" />
+      </View>}
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <FlatList data={Poissons}  renderItem={({ item, index }) => {
+        <FlatList data={All.Poissons}  renderItem={({ item, index }) => {
 
             return <View><View style={[styles.btn,{height:380, margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
@@ -95,20 +82,26 @@ export default function PoissonsScreen({navigation,route}) {
                         <View style={{ flexDirection: 'row', alignContent: 'center', justifyContent: 'space-between', width: "100%" }}>
                             <Text style={styles.title}>{item.name}</Text>
                             <TouchableOpacity onPress={() => {
-                                let x =[...Poissons]
+                                let x ={...All}
 
-                                x[index].quantity = x[index].quantity + 0.250
-                                storeData('totalP',{data:totalP+x[index].unitPrice*0.250})
-                                setTotalP(totalP+x[index].unitPrice*0.250)
-                                setPoissons(x)
+                                x.Poissons[index].quantity = x.Poissons[index].quantity + 0.250
+                                storeData('totalP',{data:totalP+x.Poissons[index].unitPrice*0.250})
+                                setTotalP(totalP+x.Poissons[index].unitPrice*0.250)
+                                
+                                storeData('All',x)
+                                setAll(x)
                             }} style={{ backgroundColor: '#00cc00', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>+</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
-                                let x = [ ...Poissons] 
-                                if (x[index].quantity>0){setTotalP(totalP-x[index].unitPrice*0.250)}
-                                x[index].quantity = Number(Math.max(x[index].quantity - 0.250, 0))
-                                setPoissons(x)
+                                let x = {...All}
+                                if (x.Poissons[index].quantity>0){
+                                    storeData('totalP',{data:totalP-x.Poissons[index].unitPrice*0.250})
+                                    setTotalP(totalP-x.Poissons[index].unitPrice*0.250)}
+                                x.Poissons[index].quantity = Number(Math.max(x.Poissons[index].quantity - 0.250, 0))
+                                storeData('All',x)
+                                setAll(x)
+
                             }} style={{ backgroundColor: 'red', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
@@ -119,41 +112,45 @@ export default function PoissonsScreen({navigation,route}) {
             <View style={{flex:1,alignItems:'center',justifyContent:'space-between',flexDirection:"row",height:"100%"}}>
                 <View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",width:"26%",alignItems:'flex-start',margin:15}}>
                     <TouchableOpacity onPress={()=>{
-                        let x=[...Poissons]
-                        x[index].way=ways[0]
-                        setPoissons(x)
+                        let x={...All}
+                        x.Poissons[index].way=ways[0]
+                        storeData('All',x)
+                        setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:Poissons[index].way===ways[0]&&Poissons[index].quantity>0?'underline':'none',color:(Poissons[index].way===ways[0]&&Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[0]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[0]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[0]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[0]}</Text>
                     </TouchableOpacity >
                     <TouchableOpacity onPress={()=>{
-                        let x=[...Poissons]
-                        x[index].way=ways[1]
-                        setPoissons(x)
+                        let x={...All}
+                        x.Poissons[index].way=ways[1]
+                        storeData('All',x)
+                        setAll(x)
                     }} >
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:Poissons[index].way===ways[1]&&Poissons[index].quantity>0?'underline':'none',color:(Poissons[index].way===ways[1]&&Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[1]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[1]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[1]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[1]}</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",margin:15}}>
                     <TouchableOpacity onPress={()=>{
-                        let x=[...Poissons]
-                        x[index].way=ways[2]
-                        setPoissons(x)
+                        let x={...All}
+                        x.Poissons[index].way=ways[2]
+                        storeData('All',x)
+                        setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:(Poissons[index].way===ways[2]&&Poissons[index].quantity>0)?'underline':'none',color:(Poissons[index].way===ways[2]&&Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[2]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:(All.Poissons[index].way===ways[2]&&All.Poissons[index].quantity>0)?'underline':'none',color:(All.Poissons[index].way===ways[2]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[2]}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={()=>{
-                        let x=[...Poissons]
-                        x[index].way=ways[3]
-                        setPoissons(x)
+                        let x={...All}
+                        x.Poissons[index].way=ways[3]
+                        storeData('All',x)
+                        setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:Poissons[index].way===ways[3]&&Poissons[index].quantity>0?'underline':'none',color:(Poissons[index].way===ways[3]&&Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[3]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[3]}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
             
         
         </View>
-        {index===Poissons.length-1?<View style={{height:60}}></View>:null}
+        {index===All.Poissons.length-1?<View style={{height:60}}></View>:null}
         </View>
         }} />
         
@@ -161,17 +158,17 @@ export default function PoissonsScreen({navigation,route}) {
 
         <View style={styles.scrol}>
 
-            <TouchableOpacity style={[styles.call,{margin:25}]}>
+            <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.panier} onPress={()=>{
+            <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{
                     navigation.navigate('panier')
                 }}>
                 <Icon as={Ionicons} name="cart"  size={5}/>
                 <Text style={{fontSize:12,fontWeight:'900',margin:8}}>{(totalB+totalD+totalE+totalP)>0?(totalB+totalD+totalE+totalP).toString()+ 'DHs':'Panier'} </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             </View>
     </NativeBaseProvider>
@@ -244,6 +241,15 @@ const styles = StyleSheet.create({
         elevation: 2,
 
     },
+    container: {
+        flex: 1,
+        justifyContent: "center"
+      },
+      horizontal: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 10
+      },
     panier: {
         width: 140,
         backgroundColor: 'white',

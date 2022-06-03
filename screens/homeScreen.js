@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { View, ScrollView, Text, TouchableOpacity, Image, StyleSheet, FlatList, ImageBackground, StatusBar } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, Image, StyleSheet, FlatList, ImageBackground, StatusBar,Linking } from 'react-native';
 import { NativeBaseProvider, Icon } from 'native-base';
 import * as NavigationBar from 'expo-navigation-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { calls } from '../call';
 import { Ionicons } from '@expo/vector-icons';
+
+
 
 export default function HomeScreen({navigation,route}) {
     NavigationBar.setVisibilityAsync('hidden')
@@ -20,31 +23,38 @@ const [totalE,setTotalE]=React.useState(0)
 const [totalB,setTotalB]=React.useState(0)
 const [totalD,setTotalD]=React.useState(0)
 
+// console.log('Home')
+
 React.useEffect(()=>{
     async function getData(){
         try {
             await AsyncStorage.getItem('All').then((value)=>{
+                // console.log(JSON.parse(value).Poissons)
                 if (value){
                     setPoissons(JSON.parse(value).Poissons)
                     }
             })
             await AsyncStorage.getItem('totalE').then((value)=>{
                 if (value){
+                    // console.log(JSON.parse(value))
                     setTotalE(JSON.parse(value).data)
                     }
             })
         await AsyncStorage.getItem('totalB').then((value)=>{
             if (value){
+                // console.log(JSON.parse(value))
                 setTotalB(JSON.parse(value).data)
                 }
         })
         await AsyncStorage.getItem('totalD').then((value)=>{
             if (value){
+                // console.log(JSON.parse(value))
                 setTotalD(JSON.parse(value).data)
                 }
         })
         await AsyncStorage.getItem('totalP').then((value)=>{
             if (value){
+                // console.log(JSON.parse(value))
                 setTotalP(JSON.parse(value).data)
                 }
         })
@@ -145,9 +155,9 @@ React.useEffect(()=>{
         </NativeBaseProvider>
         <View style={styles.scrol}>
 
-            <TouchableOpacity style={[styles.call,{margin:25}]}>
+            <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
             </TouchableOpacity>
 
             {/* <TouchableOpacity style={styles.panier} onPress={()=>{
@@ -245,8 +255,8 @@ const styles = StyleSheet.create({
         marginRight:5
 
     },scrol: {
-        flexDirection: 'row-reverse',
-        justifyContent:'space-between',
+        flexDirection: 'row',
+        justifyContent:'center',
         height:0
     },
     call:{

@@ -1,83 +1,68 @@
 import * as React from 'react';
-import { View, Text, Button, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, Image, TouchableOpacity,ActivityIndicator } from 'react-native';
 import { NativeBaseProvider,Icon } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
-import { BackHandler } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { calls } from '../call';
 import { storeData } from './dataFunctions';
 
 export default function DessertScreen({navigation,route}) {
-    const [Dessert, setDessert] = React.useState([
-        { name: 'Flan sec', quantity: 0, unitPrice: 15, isSmall:true, pic: require('./types/Flan.jpg') },
-        { name: 'Flan Fruit', quantity: 0, unitPrice: 30, isSmall:true, pic: require('./types/Flan.jpg') },
-        { name: 'Fruits variés', quantity: 0, unitPrice: 20, isSmall:true, pic: require('./types/Flan.jpg') },
-        { name: 'Teramiso', quantity: 0, unitPrice: 20, isSmall:true, pic: require('./types/Flan.jpg') },
-    ])
+    const [All, setAll] = React.useState(null)
     const [totalP,setTotalP]=React.useState(0)
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
     const [totalD,setTotalD]=React.useState(0)
-    const [firsVisit,setFirstVisit]=React.useState(true)
-    
-    React.useEffect(()=>{
-        storeData('Dessert',{data:Dessert})
-        },[Dessert])
-    
-    React.useEffect(()=>{
-        if(!firsVisit){storeData('totalP',{data:totalP})}
-        },[totalP])
-
-
-        React.useEffect(() => {
-            const backAction = () => {
-                navigation.navigate('Home',{totalP})
-                return true;
-            };
-        
-            const backHandler = BackHandler.addEventListener(
-              "hardwareBackPress",
-              backAction 
-            );
-        
-            return () => backHandler.remove();
-          }, [])
-
-    React.useEffect(()=>{
-        setFirstVisit(false)
-        async function getData(){
-            try {
-                await AsyncStorage.getItem('totalE').then((value)=>{
+       
+        React.useEffect(()=>{
+            // console.log('again')
+            async function getData(){
+                try {
+                    await AsyncStorage.getItem('All').then((value)=>{
+                        // console.log(JSON.parse(value).Poissons)
+                        if (value){
+                            console.log(JSON.parse(value))
+                            setAll(JSON.parse(value))
+                            }
+                    })
+                    await AsyncStorage.getItem('totalE').then((value)=>{
+                        if (value){
+                            // console.log(JSON.parse(value))
+                            setTotalE(JSON.parse(value).data)
+                            }
+                    })
+                await AsyncStorage.getItem('totalB').then((value)=>{
                     if (value){
-                        console.log(JSON.parse(value))
-                        setTotalE(JSON.parse(value).data)
+                        // console.log(JSON.parse(value))
+                        setTotalB(JSON.parse(value).data)
                         }
                 })
-            await AsyncStorage.getItem('totalB').then((value)=>{
-                if (value){
-                    console.log(JSON.parse(value))
-                    setTotalB(JSON.parse(value).data)
-                    }
-            })
-            await AsyncStorage.getItem('totalD').then((value)=>{
-                if (value){
-                    console.log(JSON.parse(value))
-                    setTotalD(JSON.parse(value).data)
-                    }
-            })
-            await AsyncStorage.getItem('totalP').then((value)=>{
-                if (value){
-                    console.log(JSON.parse(value))
-                    setTotalP(JSON.parse(value).data)
-                    }
-            })
-            return null
-            } catch(e) {
+                await AsyncStorage.getItem('totalD').then((value)=>{
+                    if (value){
+                        // console.log(JSON.parse(value))
+                        setTotalD(JSON.parse(value).data)
+                        }
+                })
+                await AsyncStorage.getItem('totalP').then((value)=>{
+                    if (value){
+                        // console.log(JSON.parse(value))
+                        setTotalP(JSON.parse(value).data)
+                        }
+                })
+                return null
+                } catch(e) {
+                    console.log(e)
+                }
             }
-        }
-        
-        getData()},[])
+            // console.log('Done')
+            getData()},[])
+        if (!All){
+            // console.log(All)
+            return  <View style={[styles.container, styles.horizontal]}>
+            <ActivityIndicator size="large" color="lightblue" />
+          </View>}
     
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <FlatList data={Dessert} renderItem={({ item, index }) => {
+        <FlatList data={All.Dessert} renderItem={({ item, index }) => {
 
             return <View><View style={[styles.btn,{ margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
@@ -90,22 +75,24 @@ export default function DessertScreen({navigation,route}) {
                         <View style={{ flexDirection: 'row', alignContent: 'center', justifyContent: 'space-between', width: "100%" }}>
                             <Text style={[styles.title,{fontSize:item.name==='Fruits variés'?22:27,marginLeft:item.name==='Fruits variés'?5:15}]}>{item.name}</Text>
                             <TouchableOpacity onPress={() => {
-                                let x =[...Dessert]
+                                let x ={...All}
 
-                                x[index].quantity = x[index].quantity + 1
-                                storeData('totalE',{data:totalE+x[index].unitPrice[Number(!item.isSmall)]})
-                                setTotalE(totalE+x[index].unitPrice[Number(!item.isSmall)])
-                                setDessert(x)
+                                x.Dessert[index].quantity = x.Dessert[index].quantity + 1
+                                storeData('totalD',{data:totalD+item.unitPrice[Number(!item.isSmall)]})
+                                setTotalD(totalD+x.Dessert[index].unitPrice[Number(!item.isSmall)])
+                                storeData('All',x)
+                                setAll(x)
                             }} style={{ backgroundColor: '#00cc00', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>+</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
-                                let x = [ ...Dessert] 
-                                if (x[index].quantity>0){
-                                    storeData('totalE',{data:totalE-x[index].unitPrice[Number(!item.isSmall)]})
-                                    setTotalE(totalE-x[index].unitPrice[Number(!item.isSmall)])}
-                                x[index].quantity = Number(Math.max(x[index].quantity - 1, 0))
-                                setDessert(x)
+                                let x = {...All}
+                                if (x.Dessert[index].quantity>0){
+                                    storeData('totalD',{data:totalD-x.Dessert[index].unitPrice[Number(!item.isSmall)]})
+                                    setTotalD(totalD-x.Dessert[index].unitPrice[Number(!item.isSmall)])}
+                                x.Dessert[index].quantity = Number(Math.max(x.Dessert[index].quantity - 1, 0))
+                                storeData('All',x)
+                                setAll(x)
                             }} style={{ backgroundColor: 'red', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
@@ -116,17 +103,17 @@ export default function DessertScreen({navigation,route}) {
             {/* <View style={{flex:1,alignItems:'center',justifyContent:'space-between',margin:17,flexDirection:"row",height:'0%'}}>
                 {/* <View style={{flexDirection:'column',justifyContent:'space-between',height:"100%",width:"100%",alignItems:'flex-start',margin:15}}> */}
                     {/* <TouchableOpacity onPress={()=>{
-                        let x=[...Dessert]
-                        x[index].isSmall=true
-                        setDessert(x)
+                        let x={...All}
+                        x.Dessert[index].isSmall=true
+                        setAll(x)
                     }}>
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:Dessert[index].isSmall&&Dessert[index].quantity>0?'underline':'none',color:(Dessert[index].isSmall&&Dessert[index].quantity>0)?'black':'lightgray'}}>Petite</Text>
                         <Text style={{fontSize:11,textAlign:'center',color:(Dessert[index].isSmall&&Dessert[index].quantity>0)?'black':'lightgray'}}>{item.unitPrice[0]}</Text>
                     </TouchableOpacity >
                     <TouchableOpacity onPress={()=>{
-                        let x=[...Dessert]
-                        x[index].isSmall=false
-                        setDessert(x)
+                        let x={...All}
+                        x.Dessert[index].isSmall=false
+                        setAll(x)
                     }} >
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:!Dessert[index].isSmall&&Dessert[index].quantity>0?'underline':'none',color:(!Dessert[index].isSmall&&Dessert[index].quantity>0)?'black':'lightgray'}}>Moyenne</Text>
                         <Text style={{fontSize:11,textAlign:'center',color:(!Dessert[index].isSmall&&Dessert[index].quantity>0)?'black':'lightgray'}}>{item.unitPrice[1]}</Text>
@@ -137,23 +124,23 @@ export default function DessertScreen({navigation,route}) {
             
         
         </View>
-        {index===Dessert.length-1?<View style={{height:60}}></View>:null}
+        {index===All.Dessert.length-1?<View style={{height:60}}></View>:null}
         </View>
         }} />
         <NativeBaseProvider>
         <View style={styles.scrol}>
 
-            <TouchableOpacity style={[styles.call,{margin:25}]}>
+            <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Commander</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.panier} onPress={()=>{
+            <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{
                     navigation.navigate('panier')
                 }}>
                 <Icon as={Ionicons} name="cart"  size={5}/>
                 <Text style={{fontSize:12,fontWeight:'900',margin:8}}>{(totalB+totalD+totalE+totalP)>0?(totalB+totalD+totalE+totalP).toString()+ 'DHs':'Panier'} </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             </View> 
     </NativeBaseProvider>
@@ -250,5 +237,13 @@ const styles = StyleSheet.create({
         elevation: 3,
         marginLeft: 15
 
-    }
+    },container: {
+        flex: 1,
+        justifyContent: "center"
+      },
+      horizontal: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 10
+      },
 })
