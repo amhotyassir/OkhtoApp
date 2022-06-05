@@ -108,10 +108,10 @@ export default function EntreesScreen({navigation,route}) {
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
                         storeData('totalE',{data:totalE-(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity})
-                        
+                        setTotalE(totalE-(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity)
                         x.Entrees[index].isSmall=true
                         storeData('All',x)
-                        setTotalE(totalE-(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity)
+                        
                         setAll(x)
                     }}>
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>Petite</Text>
@@ -120,9 +120,10 @@ export default function EntreesScreen({navigation,route}) {
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
                         storeData('totalE',{data:totalE+(item.unitPrice[1]-item.unitPrice[0])*Number(item.isSmall)*item.quantity})
+                        setTotalE(totalE+(item.unitPrice[1]-item.unitPrice[0])*Number(item.isSmall)*item.quantity)
                         x.Entrees[index].isSmall=false
                         storeData('All',x)
-                        setTotalE(totalE+(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity)
+                        
                         setAll(x)
                     }} >
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>Moyenne</Text>

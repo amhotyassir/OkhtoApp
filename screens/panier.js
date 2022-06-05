@@ -16,7 +16,7 @@ export default function Panier({navigation,route}){
     const [totalP,setTotalP]=React.useState(0)
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
-    // const [totalD,setTotalD]=React.useState(0)
+    const [totalD,setTotalD]=React.useState(0)
     // const [showP,setShowP]=React.useState(false)
     // const [showE,setShowE]=React.useState(false)
     // const [showD,setShowD]=React.useState(false)
@@ -171,7 +171,6 @@ let DessertArray=Dessert.map((item,ind)=>{
     // validate
     }}
  style={[styles.call,{margin:25,alignSelf:'center'}]}>
-    <Icon as={Ionicons} color='black' name="call" size={5}/>
     <Text style={{fontSize:17,fontWeight:'bold',margin:8}}> ✔ Valider</Text>
 </TouchableOpacity>
 
