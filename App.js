@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList,ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as NavigationBar from 'expo-navigation-bar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeBaseProvider, Icon } from 'native-base';
-// import * as NavigationBar from 'expo-navigation-bar';
 import { Ionicons } from '@expo/vector-icons';
 
 import PoissonsScreen from './screens/poissonScreen'
@@ -14,6 +13,7 @@ import BoissonsScreen from './screens/BoissonScreen';
 import DessertScreen from './screens/dessertScreen';
 import HomeScreen from './screens/homeScreen';
 import Panier from './screens/panier';
+import Login from './screens/login';
 import { storeData } from './screens/dataFunctions';
 
 
@@ -25,17 +25,20 @@ function ScreenD({ navigation, route }) { return <DessertScreen navigation={navi
 function ScreenE({ navigation, route }) { return <EntreesScreen navigation={navigation} /> }
 function Ppanier({ navigation, route }) { return <Panier navigation={navigation} /> }
 function Home({ navigation, route }) { return <HomeScreen navigation={navigation} /> }
+function LoginScreen({navigation}){return <Login navigation={navigation}/>}
 
 
 
 function App() {
-  const [All,setAll]=React.useState(null)
+  // const [All,setAll]=React.useState(null)
+  // const [initial,setInitial]=React.useState('Sign up')
   React.useEffect(() => {
+    
     async function getData() {
       storeData('All', {
         Poissons: [
           { name: 'Calamar', quantity: 0, unitPrice: 140, way: 'Frit', pic: require('./screens/types/calamar.jpg') },
-          { name: 'Crevettes', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
+          { name: 'Crevettes', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/gamba.jpg') },
           { name: 'Sol', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
           { name: 'Pescadia', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
           { name: 'Borasi', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
@@ -43,27 +46,33 @@ function App() {
           { name: 'Rougi', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
 
         ], Boissons: [
-          { name: 'orange', quantity: 0, unitPrice: 20, pic: require('./screens/types/Jus.jpeg') },
-          { name: 'Jus limon', quantity: 0, unitPrice: 20, pic: require('./screens/types/Jus.jpeg') },
-          { name: 'Eau', quantity: 0, unitPrice: 10, pic: require('./screens/types/Jus.jpeg') },
-          { name: 'Thé', quantity: 0, unitPrice: 10, pic: require('./screens/types/Jus.jpeg') },
-          { name: 'Café', quantity: 0, unitPrice: 12, pic: require('./screens/types/Jus.jpeg') },
+          { name: 'orange', quantity: 0, unitPrice: 20, pic: require('./screens/types/Orange.jpg') },
+          { name: 'Jus limon', quantity: 0, unitPrice: 20, pic: require('./screens/types/limon.jpg') },
+          { name: 'Eau', quantity: 0, unitPrice: 10, pic: require('./screens/types/Eau.jpg') },
+          { name: 'Thé', quantity: 0, unitPrice: 10, pic: require('./screens/types/Thé.jpg') },
+          { name: 'Café', quantity: 0, unitPrice: 12, pic: require('./screens/types/Café.jpg') },
           { name: 'Panaché', quantity: 0, unitPrice: 20, pic: require('./screens/types/Jus.jpeg') },
   
       ], Entrees: [
-        { name: 'Salade', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Salade.jpg') },
-        { name: 'Frit', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Frit.jpg') },
-        { name: 'Paella', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Frit.jpg') },
-        { name: 'Pulpo G', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Frit.jpg') },
-        { name: 'Pulpo B', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Frit.jpg') },
-        { name: 'Pulpo', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Frit.jpg') },
-        // { name: 'Rougi', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Frit.jpg') },
+        { name: 'Salade Variée', quantity: 0, unitPrice: [20,30], isSmall:true, pic: require('./screens/types/vaiee.jpg') },
+        { name: 'Salade Mixte', quantity: 0, unitPrice: [15,25], isSmall:true, pic: require('./screens/types/mixte.jpeg') },
+        { name: 'Salade Russe', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Russe.jpg') },
+        { name: 'Salade Pulpo', quantity: 0, unitPrice: [35,45], isSmall:true, pic: require('./screens/types/Salade.jpg') },
+        { name: 'Frit', quantity: 0, unitPrice: [10,10], isSmall:true, pic: require('./screens/types/Frit.jpg') },
+        { name: 'Paella', quantity: 0, unitPrice: [20,50], isSmall:true, pic: require('./screens/types/paella.jpg') },
+        { name: 'Pulpo Gallega', quantity: 0, unitPrice: [80,100], isSmall:true, pic: require('./screens/types/Gallega.jpg') },
+        { name: 'Pulpo Brasa', quantity: 0, unitPrice: [80,100], isSmall:true, pic: require('./screens/types/Brasa.jpg') },
+        { name: 'Pulpo Escabishi', quantity: 0, unitPrice: [80,100], isSmall:true, pic: require('./screens/types/Frit.jpg') },
+        { name: 'Pulpo Ajio', quantity: 0, unitPrice: [80,100], isSmall:true, pic: require('./screens/types/ajio.jpg') },
+        { name: 'Conchas', quantity: 0, unitPrice: [30,40], isSmall:true, pic: require('./screens/types/Conchas.jpg') },
+        { name: 'croquettes', quantity: 0, unitPrice: [20,20], isSmall:true, pic: require('./screens/types/Conchas.jpg') },
+        { name: 'Pilpil', quantity: 0, unitPrice: [50,50], isSmall:true, pic: require('./screens/types/pilpil.jpg') },
 
     ], Dessert: [
           { name: 'Flan sec', quantity: 0, unitPrice: [15], isSmall:true, pic: require('./screens/types/Flan.jpg') },
-          { name: 'Flan Fruit', quantity: 0, unitPrice: [30], isSmall:true, pic: require('./screens/types/Flan.jpg') },
-          { name: 'Fruits variés', quantity: 0, unitPrice: [20], isSmall:true, pic: require('./screens/types/Flan.jpg') },
-          { name: 'Teramiso', quantity: 0, unitPrice: [20], isSmall:true, pic: require('./screens/types/Flan.jpg') },
+          { name: 'Flan Fruit', quantity: 0, unitPrice: [30], isSmall:true, pic: require('./screens/types/Flanfruit.jpg') },
+          { name: 'Fruits variés', quantity: 0, unitPrice: [20], isSmall:true, pic: require('./screens/types/Fruits.jpg') },
+          { name: 'Teramiso', quantity: 0, unitPrice: [20], isSmall:true, pic: require('./screens/types/Teramiso.jpg') },
       ]
       })
 
@@ -78,24 +87,40 @@ function App() {
 
   }, [])
 
+  // React.useEffect(()=>{
+  //   const getData2=()=>{
+  //     async function 
+  //   }
+  // },[])
+
 
   NavigationBar.setVisibilityAsync('hidden')
-  const ref = React.useRef(null)
+  // const ref = React.useRef(null)
   return (<NativeBaseProvider>
     <View style={{ flex: 1 }}>
-      <NavigationContainer ref={ref}>
-        <Stack.Navigator initialRouteName="Home">
+      <NavigationContainer >
+        <Stack.Navigator initialRouteName='Home'>
           <Stack.Screen name="Home" options={{
             headerTitle: '',
             headerBackTitle: false,
             headerTransparent: true
           }} component={Home} />
-          <Stack.Screen name="Poissons" component={ScreenP} />
-          <Stack.Screen name="Entrées" component={ScreenE} />
-          <Stack.Screen name="Boissons" component={ScreenB} />
-          <Stack.Screen name="Dessert" component={ScreenD} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }} name="Sign up" component={LoginScreen} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }} name="Poissons" component={ScreenP} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }} name="Entrées" component={ScreenE} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }} name="Boissons" component={ScreenB} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }}  name="Dessert" component={ScreenD} />
           <Stack.Screen name="panier" component={Ppanier} />
-
 
         </Stack.Navigator>
       </NavigationContainer>

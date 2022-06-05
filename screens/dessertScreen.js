@@ -20,7 +20,7 @@ export default function DessertScreen({navigation,route}) {
                     await AsyncStorage.getItem('All').then((value)=>{
                         // console.log(JSON.parse(value).Poissons)
                         if (value){
-                            console.log(JSON.parse(value))
+                            // console.log(JSON.parse(value))
                             setAll(JSON.parse(value))
                             }
                     })

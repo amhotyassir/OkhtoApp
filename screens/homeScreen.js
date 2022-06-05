@@ -252,7 +252,9 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         alignItems: "center",
         justifyContent: "center",
-        marginRight:5
+        marginRight:5,
+        borderWidth:1.8,
+        borderColor:'#999966'
 
     },scrol: {
         flexDirection: 'row',

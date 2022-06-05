@@ -20,7 +20,7 @@ export default function EntreesScreen({navigation,route}) {
                     await AsyncStorage.getItem('All').then((value)=>{
                         // console.log(JSON.parse(value).Poissons)
                         if (value){
-                            console.log(JSON.parse(value))
+                            // console.log(JSON.parse(value))
                             setAll(JSON.parse(value))
                             }
                     })
@@ -64,7 +64,7 @@ export default function EntreesScreen({navigation,route}) {
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <FlatList data={All.Entrees} renderItem={({ item, index }) => {
 
-            return <View><View style={[styles.btn,{ height:380,margin: 25,justifyContent:'flex-start'}]}>
+            return <View><View style={[styles.btn,{ height:100*(item.unitPrice[0]!==item.unitPrice[1])+280,margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
                     <View>
                         <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.pic} />
@@ -72,14 +72,17 @@ export default function EntreesScreen({navigation,route}) {
 
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100, backgroundColor: 'white', opacity: 0.75, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} />
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100 }}>
-                        <View style={{ flexDirection: 'row', alignContent: 'center', justifyContent: 'space-between', width: "100%" }}>
-                            <Text style={[styles.title,{fontSize:item.name==='Fruits variés'?22:27,marginLeft:item.name==='Fruits variés'?5:15}]}>{item.name}</Text>
-                            <TouchableOpacity onPress={() => {
+                        <View style={{ flexDirection: 'row', alignContent: 'center', justifyContent: 'space-between', width: "100%",marginTop:-10 }}>
+                            {item.name.substring(0,3)==='Pul'?<View style={{flexDirection:'column'}}><Text style={[styles.title,{fontSize:23,marginLeft:7}]}>Pulpo</Text>
+                            <Text style={[styles.title,{fontSize:23,marginLeft:7,marginTop:-15}]}>{item.name.substring(5)}</Text></View>:item.name.substring(0,3)==='Sal'?<View style={{flexDirection:'column'}}><Text style={[styles.title,{fontSize:23,marginLeft:7}]}>Salade</Text>
+                            <Text style={[styles.title,{fontSize:23,marginLeft:7,marginTop:-15}]}>{item.name.substring(6)}</Text></View>:<Text style={[styles.title,{fontSize:23,marginLeft:7}]}>{item.name}</Text>}
+                            
+                            <TouchableOpacity onPress={() => {   
                                 let x ={...All}
 
                                 x.Entrees[index].quantity = x.Entrees[index].quantity + 1
-                                storeData('totalD',{data:totalD+item.unitPrice[Number(!item.isSmall)]})
-                                setTotalD(totalD+x.Entrees[index].unitPrice[Number(!item.isSmall)])
+                                storeData('totalE',{data:totalE+item.unitPrice[Number(!item.isSmall)]})
+                                setTotalE(totalE+x.Entrees[index].unitPrice[Number(!item.isSmall)])
                                 storeData('All',x)
                                 setAll(x)
                             }} style={{ backgroundColor: '#00cc00', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
@@ -88,8 +91,8 @@ export default function EntreesScreen({navigation,route}) {
                             <TouchableOpacity onPress={() => {
                                 let x = {...All}
                                 if (x.Entrees[index].quantity>0){
-                                    storeData('totalD',{data:totalD-x.Entrees[index].unitPrice[Number(!item.isSmall)]})
-                                    setTotalD(totalD-x.Entrees[index].unitPrice[Number(!item.isSmall)])}
+                                    storeData('totalE',{data:totalE-x.Entrees[index].unitPrice[Number(!item.isSmall)]})
+                                    setTotalE(totalE-x.Entrees[index].unitPrice[Number(!item.isSmall)])}
                                 x.Entrees[index].quantity = Number(Math.max(x.Entrees[index].quantity - 1, 0))
                                 storeData('All',x)
                                 setAll(x)
@@ -97,14 +100,18 @@ export default function EntreesScreen({navigation,route}) {
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}</Text>
+                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold',fontSize:20,marginTop:-10*(item.name.length>7)}}>{item.quantity}</Text>
                     </View>
                 </View>
-            <View style={{flex:1,alignItems:'center',justifyContent:'space-between',margin:17,flexDirection:"column",height:'0%'}}>
+            <View style={{flex:1,alignItems:'center',justifyContent:'space-between',margin:17,flexDirection:"column"}}>
                 <View style={{flexDirection:'row',justifyContent:'space-between',height:"100%",width:"100%",alignItems:'flex-start',margin:15}}> 
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
+                        storeData('totalE',{data:totalE-(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity})
+                        
                         x.Entrees[index].isSmall=true
+                        storeData('All',x)
+                        setTotalE(totalE-(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity)
                         setAll(x)
                     }}>
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>Petite</Text>
@@ -112,7 +119,10 @@ export default function EntreesScreen({navigation,route}) {
                     </TouchableOpacity >
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
+                        storeData('totalE',{data:totalE+(item.unitPrice[1]-item.unitPrice[0])*Number(item.isSmall)*item.quantity})
                         x.Entrees[index].isSmall=false
+                        storeData('All',x)
+                        setTotalE(totalE+(item.unitPrice[1]-item.unitPrice[0])*Number(!item.isSmall)*item.quantity)
                         setAll(x)
                     }} >
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>Moyenne</Text>
