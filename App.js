@@ -6,14 +6,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import * as NavigationBar from 'expo-navigation-bar';
 import { NativeBaseProvider, Icon } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
-
 import PoissonsScreen from './screens/poissonScreen'
 import EntreesScreen from './screens/entreesScreen';
 import BoissonsScreen from './screens/BoissonScreen';
 import DessertScreen from './screens/dessertScreen';
 import HomeScreen from './screens/homeScreen';
 import Panier from './screens/panier';
-import Login from './screens/login';
+import Test2  from './screens/test';
+import Test from './screens/signin';
 import { storeData } from './screens/dataFunctions';
 
 
@@ -25,29 +25,31 @@ function ScreenD({ navigation, route }) { return <DessertScreen navigation={navi
 function ScreenE({ navigation, route }) { return <EntreesScreen navigation={navigation} /> }
 function Ppanier({ navigation, route }) { return <Panier navigation={navigation} /> }
 function Home({ navigation, route }) { return <HomeScreen navigation={navigation} /> }
-function LoginScreen({navigation}){return <Login navigation={navigation}/>}
+function TestScreen2({navigation}){return <Test2 navigation={navigation}/>}
+function TestScreen({navigation}){return <Test navigation={navigation} />}
 
 
 
 function App() {
   // const [All,setAll]=React.useState(null)
   // const [initial,setInitial]=React.useState('Sign up')
+  const [lang,setLang]=React.useState('ar')
   React.useEffect(() => {
     
     async function getData() {
       storeData('All', {
         Poissons: [
           { name: 'Calamar', quantity: 0, unitPrice: 140, way: 'Frit', pic: require('./screens/types/calamar.jpg') },
-          { name: 'Crevettes', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/gamba.jpg') },
-          { name: 'Sol', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
-          { name: 'Pescadia', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
-          { name: 'Borasi', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
-          { name: 'Rapi', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
-          { name: 'Rougi', quantity: 0, unitPrice: 140, way: 'Plancha', pic: require('./screens/types/calamar.jpg') },
+          { name: 'Crevettes', quantity: 0, unitPrice: 140, way: 'Grillé', pic: require('./screens/types/gamba.jpg') },
+          { name: 'Sol', quantity: 0, unitPrice: 140, way: 'Grillé', pic: require('./screens/types/calamar.jpg') },
+          { name: 'Pescadia', quantity: 0, unitPrice: 140, way: 'Grillé', pic: require('./screens/types/calamar.jpg') },
+          { name: 'Borasi', quantity: 0, unitPrice: 140, way: 'Grillé', pic: require('./screens/types/calamar.jpg') },
+          { name: 'Rapi', quantity: 0, unitPrice: 140, way: 'Grillé', pic: require('./screens/types/calamar.jpg') },
+          { name: 'Rougi', quantity: 0, unitPrice: 140, way: 'Grillé', pic: require('./screens/types/calamar.jpg') },
 
         ], Boissons: [
-          { name: 'orange', quantity: 0, unitPrice: 20, pic: require('./screens/types/Orange.jpg') },
-          { name: 'Jus limon', quantity: 0, unitPrice: 20, pic: require('./screens/types/limon.jpg') },
+          { name: 'Orange', quantity: 0, unitPrice: 20, pic: require('./screens/types/Orange.jpg') },
+          { name: 'Limon', quantity: 0, unitPrice: 20, pic: require('./screens/types/limon.jpg') },
           { name: 'Eau', quantity: 0, unitPrice: 10, pic: require('./screens/types/Eau.jpg') },
           { name: 'Thé', quantity: 0, unitPrice: 10, pic: require('./screens/types/Thé.jpg') },
           { name: 'Café', quantity: 0, unitPrice: 12, pic: require('./screens/types/Café.jpg') },
@@ -80,34 +82,23 @@ function App() {
       storeData('totalD', { data: 0 })
       storeData('totalB', { data: 0 })
       storeData('totalE', { data: 0 })
-      // await AsyncStorage.removeItem('All');
       return null
     }
     getData()
-
+    // AsyncStorage.removeItem('num')
   }, [])
-
-  // React.useEffect(()=>{
-  //   const getData2=()=>{
-  //     async function 
-  //   }
-  // },[])
 
 
   NavigationBar.setVisibilityAsync('hidden')
-  // const ref = React.useRef(null)
   return (<NativeBaseProvider>
     <View style={{ flex: 1 }}>
       <NavigationContainer >
-        <Stack.Navigator initialRouteName='Home'>
+        <Stack.Navigator initialRouteName='test2'>
           <Stack.Screen name="Home" options={{
             headerTitle: '',
             headerBackTitle: false,
             headerTransparent: true
           }} component={Home} />
-          <Stack.Screen options={{
-            headerTitleAlign:'center'
-          }} name="Sign up" component={LoginScreen} />
           <Stack.Screen options={{
             headerTitleAlign:'center'
           }} name="Poissons" component={ScreenP} />
@@ -120,7 +111,13 @@ function App() {
           <Stack.Screen options={{
             headerTitleAlign:'center'
           }}  name="Dessert" component={ScreenD} />
-          <Stack.Screen name="panier" component={Ppanier} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }} name="panier" component={Ppanier} />
+          <Stack.Screen options={{
+            headerTitleAlign:'center'
+          }} name='Sign up' component={TestScreen} />
+          <Stack.Screen name='test' component={TestScreen2}/>
 
         </Stack.Navigator>
       </NavigationContainer>

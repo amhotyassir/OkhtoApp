@@ -1,10 +1,56 @@
 import * as React from 'react';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import * as Network from 'expo-network';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Text,View,TouchableOpacity,ScrollView,Image,ActivityIndicator,StyleSheet} from 'react-native';
 import { NativeBaseProvider,Icon,Toast } from 'native-base';
-import { Ionicons } from '@expo/vector-icons';
-import { calls } from '../call';
+import { getDatabase, ref, onValue,set,onChildAdded } from 'firebase/database';
 
+Notifications.setNotificationHandler({
+handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+}),
+});
+async function sendNotif(admins,data){
+    let pdata=data.Poissons.map((item)=>{
+        return item.slice(0,item.length-1)
+    })
+    let ddata=data.Dessert.map((item)=>{
+        return item.slice(0,item.length-1)
+    })
+    let bdata=data.Boissons.map((item)=>{
+        return item.slice(0,item.length-1)
+    })
+    let edata=data.Entrees.map((item)=>{
+        return item.slice(0,item.length-1)
+    })
+    
+    admins.map(async function(expoPushToken){
+    // console.log('token=',expoPushToken)
+    sendSpecificNotificiation(expoPushToken,{Poissons:pdata,Boissons:bdata,Entrees:edata,Dessert:ddata})})
+}
+async function sendSpecificNotificiation(expoPushToken,data) {
+    const message = {
+      to: `ExponentPushToken[${expoPushToken}]`,
+      sound: 'default',
+      title: 'Original Title',
+      body: 'Nouvelle ordre',
+      data: data,
+    };
+  
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+  }
 
 export default function Panier({navigation,route}){
     
@@ -17,10 +63,27 @@ export default function Panier({navigation,route}){
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
     const [totalD,setTotalD]=React.useState(0)
-    // const [showP,setShowP]=React.useState(false)
-    // const [showE,setShowE]=React.useState(false)
-    // const [showD,setShowD]=React.useState(false)
-    // const [showB,setShowB]=React.useState(false)
+    const [lang,setLang]=React.useState('')
+    const [num,setNum]=React.useState('')
+    const [admins,setAdmins]=React.useState([])
+    const [credit,setCredit]=React.useState(null)
+    const [sent, setSent] = React.useState(false);
+    React.useEffect(()=>{
+        
+        const setupHighscoreListener=() =>{const db = getDatabase();
+            
+            const reference = ref(db, 'Admins/' );
+            onValue(reference, (snapshot) => {
+              const Admins = snapshot.val();
+            //   console.log('en',Object.entries(Admins))
+              let x=Object.entries(Admins).forEach(item => {
+                setAdmins([...admins,item[1]])
+              })
+            });
+          }
+          setupHighscoreListener()
+    },[])
+    
     
     React.useEffect(()=>{
         async function getData(){
@@ -36,10 +99,28 @@ export default function Panier({navigation,route}){
                         
                         }
                 })
+                await AsyncStorage.getItem('num').then((value)=>{
+                    if (value){
+                        // console.log(JSON.parse(value))
+                        setNum(JSON.parse(value))
+                        }
+                })
                 await AsyncStorage.getItem('totalE').then((value)=>{
                     if (value){
                         // console.log(JSON.parse(value))
                         setTotalE(JSON.parse(value).data)
+                        }
+                })
+                await AsyncStorage.getItem('lang').then((value)=>{
+                    if (value){
+                        // console.log(JSON.parse(value))
+                        setLang(JSON.parse(value))
+                        }
+                })
+                await AsyncStorage.getItem('credit').then((value)=>{
+                    if (value){
+                        // console.log(JSON.parse(value))
+                        setCredit(JSON.parse(value))
                         }
                 })
             await AsyncStorage.getItem('totalB').then((value)=>{
@@ -149,40 +230,52 @@ let DessertArray=Dessert.map((item,ind)=>{
 
     return<ScrollView>
         <NativeBaseProvider>
-    <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Poissons :'.repeat(totalP>0)}</Text>
-    <View>{PoissonsArray}</View>
+            <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Poissons :'.repeat(totalP>0)}</Text>
+            <View>{PoissonsArray}</View>
 
-    <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Entrées :'.repeat(totalE>0)}</Text>
-    <View>{EntreeArray}</View>
+            <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Entrées :'.repeat(totalE>0)}</Text>
+            <View>{EntreeArray}</View>
 
-    <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Boissons :'.repeat(totalB>0)}</Text>
-    <View>{BoissonsArray}</View>
+            <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Boissons :'.repeat(totalB>0)}</Text>
+            <View>{BoissonsArray}</View>
 
-    <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Dessert :'.repeat(totalD>0)}</Text>
-    <View>{DessertArray}</View>
+            <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Dessert :'.repeat(totalD>0)}</Text>
+            <View>{DessertArray}</View>
 
-    <View style={{width:'100%', marginTop:30}}>
-        <Text style={{textAlign:'center',fontWeight:'bold',fontSize:40}}>{totalB+totalE+totalD+totalP>0?`Total = ${totalB+totalE+totalD+totalP} Dhs`:'Panier vide'}</Text>
-    </View>
+            <View style={{width:'100%', marginTop:30}}>
+                <Text style={{textAlign:'center',fontWeight:'bold',fontSize:40}}>{totalB+totalE+totalD+totalP>0?`Total = ${totalB+totalE+totalD+totalP} Dhs`:'Panier vide'}</Text>
+            </View>
 
-    <View style={styles.scrol}>
+           {totalB+totalE+totalD+totalP>0? <View style={styles.scrol}>
 
-<TouchableOpacity onPress={()=>{
-    // validate
-    }}
- style={[styles.call,{margin:25,alignSelf:'center'}]}>
-    <Text style={{fontSize:17,fontWeight:'bold',margin:8}}> ✔ Valider</Text>
-</TouchableOpacity>
+        <TouchableOpacity onPress={async function(){
+            const netObj=await Network.getNetworkStateAsync();
+            if(netObj.isConnected&&netObj.isInternetReachable){
+                if (num===''){
+                navigation.navigate('Sign up')
+            }else{
 
-{/* <TouchableOpacity style={styles.panier} onPress={()=>{
-        navigation.navigate('panier')
-    }}>
-    <Icon as={Ionicons} name="cart"  size={5}/>
-    <Text style={{fontSize:12,fontWeight:'900',margin:8}}>{(totalB+totalD+totalE+totalP)>0?(totalB+totalD+totalE+totalP).toString()+ 'DHs':'Panier'} </Text>
-</TouchableOpacity> */}
+                if (!sent){
+                    sendNotif(admins,{...All,num:num})
+                    setSent(true)
+                    // Toast.show({})
+                    AsyncStorage.removeItem('All')
+                    navigation.navigate('Home')
+                }
+            
+            }
+            }else{
+                Alert.alert(lang==='fr'?'Erreur Internet':'مشكلة انترنيت',lang==='fr'?"Il y'avais une problème de connexion Internet":" توجد مشكلة انترنيت")
+            }
+            
+            }}
+        style={[styles.call,{margin:25,alignSelf:'center'}]}>
+            <Text style={{fontSize:17,fontWeight:'bold',margin:8}}> ✔ Réserver</Text>
+        </TouchableOpacity></View>:null}
 
-</View>
-</NativeBaseProvider>
+
+        
+        </NativeBaseProvider>
     </ScrollView>
 }
 
