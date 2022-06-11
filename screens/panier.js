@@ -254,7 +254,6 @@ let DessertArray=Dessert.map((item,ind)=>{
                 if (num===''){
                 navigation.navigate('Sign up')
             }else{
-
                 if (!sent){
                     sendNotif(admins,{...All,num:num})
                     setSent(true)
@@ -262,15 +261,13 @@ let DessertArray=Dessert.map((item,ind)=>{
                     AsyncStorage.removeItem('All')
                     navigation.navigate('Home')
                 }
-            
             }
             }else{
                 Alert.alert(lang==='fr'?'Erreur Internet':'مشكلة انترنيت',lang==='fr'?"Il y'avais une problème de connexion Internet":" توجد مشكلة انترنيت")
             }
-            
             }}
         style={[styles.call,{margin:25,alignSelf:'center'}]}>
-            <Text style={{fontSize:17,fontWeight:'bold',margin:8}}> ✔ Réserver</Text>
+            <Text style={{fontSize:17,fontWeight:'bold',margin:8}}> ✔ {lang==='fr'?'Réserver':'حجز'}</Text>
         </TouchableOpacity></View>:null}
 
 

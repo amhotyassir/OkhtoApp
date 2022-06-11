@@ -12,7 +12,14 @@ export default function EntreesScreen({navigation,route}) {
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
     const [totalD,setTotalD]=React.useState(0)
-       
+    const [lang,setLang]=React.useState('ar')
+    const translate=(str)=>{
+        if (str==='Petite'){
+            // console.log('fritoo')
+            return 'صغيرة'
+        }if(str==='Moyenne'){
+            return 'متوسطة'
+        }}
         React.useEffect(()=>{
             // console.log('again')
             async function getData(){
@@ -22,6 +29,13 @@ export default function EntreesScreen({navigation,route}) {
                         if (value){
                             // console.log(JSON.parse(value))
                             setAll(JSON.parse(value))
+                            }
+                    })
+                    await AsyncStorage.getItem('lang').then((value)=>{
+                        // console.log(JSON.parse(value).Poissons)
+                        if (value){
+                            // console.log(JSON.parse(value))
+                            setLang(JSON.parse(value))
                             }
                     })
                     await AsyncStorage.getItem('totalE').then((value)=>{
@@ -114,7 +128,7 @@ export default function EntreesScreen({navigation,route}) {
                         
                         setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>Petite</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?'Petite':translate('Petite')}</Text>
                         <Text style={{fontSize:11,textAlign:'center',color:(All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>{item.unitPrice[0]}</Text>
                     </TouchableOpacity >
                     <TouchableOpacity onPress={()=>{
@@ -126,7 +140,7 @@ export default function EntreesScreen({navigation,route}) {
                         
                         setAll(x)
                     }} >
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>Moyenne</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0?'underline':'none',color:(!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?'Moyenne':translate('Moyenne')}</Text>
                         <Text style={{fontSize:11,textAlign:'center',color:(!All.Entrees[index].isSmall&&All.Entrees[index].quantity>0)?'black':'lightgray'}}>{item.unitPrice[1]}</Text>
                     </TouchableOpacity> 
                  </View>
@@ -143,7 +157,7 @@ export default function EntreesScreen({navigation,route}) {
 
             <TouchableOpacity  onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>{lang==='fr'?'Réserver':'حجز'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{

@@ -132,7 +132,7 @@ export default function DessertScreen({navigation,route}) {
 
             <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>{lang==='fr'?'Réserver':'حجز'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{

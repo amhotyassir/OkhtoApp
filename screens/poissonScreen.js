@@ -10,17 +10,26 @@ import { storeData } from './dataFunctions';
 
 export default function PoissonsScreen({navigation,route}) {
     const [All, setAll] = React.useState(null)
-    const ways = ['Frit', 'Plancha', 'Sauce Ajio', 'Sauce Regamonte']
+    const ways = ['Frit', 'Grillé', 'Sauce Ajio', 'Sauce Regamonte']
     const [totalP,setTotalP]=React.useState(0)
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
+    const [lang,setLang]=React.useState('ar')
     const [totalD,setTotalD]=React.useState(0)
     // const [firsVisit,setFirstVisit]=React.useState(true)
-    
-   
-
-      
-
+    const translate=(str)=>{
+        if (str==='Frit'){
+            // console.log('fritoo')
+            return 'مقلي'
+        }if(str==='Grillé'){
+            return 'مشوي'
+        }
+        if(str==='Sauce Ajio'){
+            return 'صلصة الثوم'
+        }if (str==='Sauce Regamonte'){
+            return 'صلصة الفلفل'
+        }
+    }
     React.useEffect(()=>{
         // console.log('again')
         async function getData(){
@@ -54,6 +63,12 @@ export default function PoissonsScreen({navigation,route}) {
                 if (value){
                     // console.log(JSON.parse(value))
                     setTotalP(JSON.parse(value).data)
+                    }
+            })
+            await AsyncStorage.getItem('lang').then((value)=>{
+                if (value){
+                    // console.log(JSON.parse(value))
+                    setLang(JSON.parse(value).data)
                     }
             })
             return null
@@ -117,7 +132,7 @@ export default function PoissonsScreen({navigation,route}) {
                         storeData('All',x)
                         setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[0]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[0]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[0]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[0]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[0]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?ways[0]:translate(ways[0])}</Text>
                     </TouchableOpacity >
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
@@ -125,7 +140,7 @@ export default function PoissonsScreen({navigation,route}) {
                         storeData('All',x)
                         setAll(x)
                     }} >
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[1]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[1]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[1]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[1]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[1]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?ways[1]:translate(ways[1])}</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",margin:15}}>
@@ -135,7 +150,7 @@ export default function PoissonsScreen({navigation,route}) {
                         storeData('All',x)
                         setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:(All.Poissons[index].way===ways[2]&&All.Poissons[index].quantity>0)?'underline':'none',color:(All.Poissons[index].way===ways[2]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[2]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:(All.Poissons[index].way===ways[2]&&All.Poissons[index].quantity>0)?'underline':'none',color:(All.Poissons[index].way===ways[2]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?ways[2]:translate(ways[2])}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
@@ -143,7 +158,7 @@ export default function PoissonsScreen({navigation,route}) {
                         storeData('All',x)
                         setAll(x)
                     }}>
-                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{ways[3]}</Text>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?ways[3]:translate(ways[3])}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -160,7 +175,7 @@ export default function PoissonsScreen({navigation,route}) {
 
             <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>{lang==='fr'?'Réserver':'حجز'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{

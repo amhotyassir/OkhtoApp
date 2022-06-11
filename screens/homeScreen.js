@@ -22,7 +22,7 @@ const [totalP,setTotalP]=React.useState(0)
 const [totalE,setTotalE]=React.useState(0)
 const [totalB,setTotalB]=React.useState(0)
 const [totalD,setTotalD]=React.useState(0)
-
+const [lang,setLang]=React.useState('ar')
 // console.log('Home')
 
 React.useEffect(()=>{
@@ -32,6 +32,12 @@ React.useEffect(()=>{
                 // console.log(JSON.parse(value).Poissons)
                 if (value){
                     setPoissons(JSON.parse(value).Poissons)
+                    }
+            })
+            await AsyncStorage.getItem('lang').then((value)=>{
+                if (value){
+                    // console.log(JSON.parse(value))
+                    setLang(JSON.parse(value))
                     }
             })
             await AsyncStorage.getItem('totalE').then((value)=>{
@@ -68,19 +74,19 @@ React.useEffect(()=>{
     const titles = [
         {
             key: 0,
-            title: "Poissons"
+            title: "Poissons",
         },
         {
             key: 1,
-            title: "Entrées"
+            title: "Entrées",
         },
         {
             key: 2,
-            title: "Boissons"
+            title: "Boissons",
         },
         {
             key: 3,
-            title: "Dessert"
+            title: "Dessert",
         },
 
     ]
@@ -152,22 +158,22 @@ React.useEffect(()=>{
             </View>
         }} />
         
-        </NativeBaseProvider>
+        
         <View style={styles.scrol}>
 
             <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>{lang==='fr'?'Réserver':'حجز'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{
+                    
+                }}>
+                <Icon as={Ionicons} name="settings" size={5}/>
+                <Text style={{fontSize:12,fontWeight:'900',margin:8,textAlign:'center'}}>{lang==='fr'?'Paramètres':'اعدادات'}</Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.panier} onPress={()=>{
-                    navigation.navigate('panier')
-                }}>
-                <Icon as={Ionicons} name="cart"  size={5}/>
-                <Text style={{fontSize:12,fontWeight:'900',margin:8}}>{(totalB+totalD+totalE+totalP)>0?(totalB+totalD+totalE+totalP).toString()+ 'DHs':'Panier'} </Text>
-            </TouchableOpacity> */}
-
         </View>
+        </NativeBaseProvider>
     </View>
 }
 const styles = StyleSheet.create({
