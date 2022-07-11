@@ -12,6 +12,7 @@ export default function DessertScreen({navigation,route}) {
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
     const [totalD,setTotalD]=React.useState(0)
+    const [lang,setLang]=React.useState('fr')
        
         React.useEffect(()=>{
             // console.log('again')
@@ -28,6 +29,12 @@ export default function DessertScreen({navigation,route}) {
                         if (value){
                             // console.log(JSON.parse(value))
                             setTotalE(JSON.parse(value).data)
+                            }
+                    })
+                    await AsyncStorage.getItem('lang').then((value)=>{
+                        if (value){
+                            // console.log(JSON.parse(value))
+                            setLang(JSON.parse(value))
                             }
                     })
                 await AsyncStorage.getItem('totalB').then((value)=>{
@@ -67,7 +74,7 @@ export default function DessertScreen({navigation,route}) {
             return <View><View style={[styles.btn,{ margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
                     <View>
-                        <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.pic} />
+                    {item.url?<Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.url&&{uri:item.url}} />:<ActivityIndicator style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} size="large" color="lightblue" />}
                     </View>
 
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100, backgroundColor: 'white', opacity: 0.75, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} />
@@ -97,7 +104,7 @@ export default function DessertScreen({navigation,route}) {
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}</Text>
+                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}    x {item.unitPrice}</Text>
                     </View>
                 </View>
             {/* <View style={{flex:1,alignItems:'center',justifyContent:'space-between',margin:17,flexDirection:"row",height:'0%'}}>

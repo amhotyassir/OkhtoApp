@@ -188,7 +188,6 @@ export default function Test({navigation}) {
       )}
       {attemptInvisibleVerification && <FirebaseRecaptchaBanner />}
     </View>
-    <Button title='test' onPress={()=>navigation.navigate('test')} />
     </View>
   );
 }

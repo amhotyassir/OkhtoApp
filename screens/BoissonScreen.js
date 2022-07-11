@@ -13,6 +13,7 @@ export default function BoissonsScreen({navigation,route}) {
     const [totalE,setTotalE]=React.useState(0)
     const [totalB,setTotalB]=React.useState(0)
     const [totalD,setTotalD]=React.useState(0)
+    const [lang,setLang]=React.useState('fr')
        
         React.useEffect(()=>{
             // console.log('again')
@@ -29,6 +30,12 @@ export default function BoissonsScreen({navigation,route}) {
                         if (value){
                             // console.log(JSON.parse(value))
                             setTotalE(JSON.parse(value).data)
+                            }
+                    })
+                    await AsyncStorage.getItem('lang').then((value)=>{
+                        if (value){
+                            // console.log(JSON.parse(value))
+                            setLang(JSON.parse(value))
                             }
                     })
                 await AsyncStorage.getItem('totalB').then((value)=>{
@@ -68,7 +75,9 @@ export default function BoissonsScreen({navigation,route}) {
             return <View><View style={[styles.btn,{ margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
                     <View>
-                        <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.pic} />
+                    {item.url?
+                    <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.url&&{uri:item.url}} />
+                    :<ActivityIndicator style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} size="large" color="lightblue" />}
                     </View>
 
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100, backgroundColor: 'white', opacity: 0.75, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} />
@@ -79,8 +88,8 @@ export default function BoissonsScreen({navigation,route}) {
                                 let x ={...All}
 
                                 x.Boissons[index].quantity = x.Boissons[index].quantity + 1
-                                storeData('totalD',{data:totalD+item.unitPrice})
-                                setTotalD(totalD+x.Boissons[index].unitPrice)
+                                storeData('totalB',{data:totalB+item.unitPrice})
+                                setTotalB(totalB+x.Boissons[index].unitPrice)
                                 storeData('All',x)
                                 setAll(x)
                             }} style={{ backgroundColor: '#00cc00', borderRadius: 10, width: 40, height: 40, alignItems: 'center', margin: 15, justifyContent: 'center' }}>
@@ -89,8 +98,8 @@ export default function BoissonsScreen({navigation,route}) {
                             <TouchableOpacity onPress={() => {
                                 let x = {...All}
                                 if (x.Boissons[index].quantity>0){
-                                    storeData('totalD',{data:totalD-x.Boissons[index].unitPrice})
-                                    setTotalD(totalD-x.Boissons[index].unitPrice)}
+                                    storeData('totalB',{data:totalB-x.Boissons[index].unitPrice})
+                                    setTotalB(totalB-x.Boissons[index].unitPrice)}
                                 x.Boissons[index].quantity = Number(Math.max(x.Boissons[index].quantity - 1, 0))
                                 storeData('All',x)
                                 setAll(x)
@@ -98,7 +107,7 @@ export default function BoissonsScreen({navigation,route}) {
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}</Text>
+                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}     x {item.unitPrice}</Text>
                     </View>
                 </View>
             {/* <View style={{flex:1,alignItems:'center',justifyContent:'space-between',margin:17,flexDirection:"row",height:'0%'}}>
@@ -133,7 +142,7 @@ export default function BoissonsScreen({navigation,route}) {
 
             <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
-                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>Réserver</Text>
+                <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>{lang==='fr'?'Réserver':'حجز'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{

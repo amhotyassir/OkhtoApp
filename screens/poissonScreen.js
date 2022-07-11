@@ -68,7 +68,8 @@ export default function PoissonsScreen({navigation,route}) {
             await AsyncStorage.getItem('lang').then((value)=>{
                 if (value){
                     // console.log(JSON.parse(value))
-                    setLang(JSON.parse(value).data)
+                    setLang(JSON.parse(value))
+                    // console.log(lang)
                     }
             })
             return null
@@ -83,13 +84,15 @@ export default function PoissonsScreen({navigation,route}) {
         return  <View style={[styles.container, styles.horizontal]}>
         <ActivityIndicator size="large" color="#00ff00" />
       </View>}
+    //   console.log(lang)
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <FlatList data={All.Poissons}  renderItem={({ item, index }) => {
 
             return <View><View style={[styles.btn,{height:380, margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
                     <View>
-                        <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.pic} />
+                        {item.url?<Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.url&&{uri:item.url}}/>:<ActivityIndicator style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} size="large" color="#00ff00" /> }
+                        
                     </View>
 
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100, backgroundColor: 'white', opacity: 0.75, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} />
@@ -99,9 +102,9 @@ export default function PoissonsScreen({navigation,route}) {
                             <TouchableOpacity onPress={() => {
                                 let x ={...All}
 
-                                x.Poissons[index].quantity = x.Poissons[index].quantity + 0.250
-                                storeData('totalP',{data:totalP+x.Poissons[index].unitPrice*0.250})
-                                setTotalP(totalP+x.Poissons[index].unitPrice*0.250)
+                                x.Poissons[index].quantity = x.Poissons[index].quantity + 1
+                                storeData('totalP',{data:totalP+x.Poissons[index].unitPrice*1})
+                                setTotalP(totalP+x.Poissons[index].unitPrice*1)
                                 
                                 storeData('All',x)
                                 setAll(x)
@@ -111,9 +114,9 @@ export default function PoissonsScreen({navigation,route}) {
                             <TouchableOpacity onPress={() => {
                                 let x = {...All}
                                 if (x.Poissons[index].quantity>0){
-                                    storeData('totalP',{data:totalP-x.Poissons[index].unitPrice*0.250})
-                                    setTotalP(totalP-x.Poissons[index].unitPrice*0.250)}
-                                x.Poissons[index].quantity = Number(Math.max(x.Poissons[index].quantity - 0.250, 0))
+                                    storeData('totalP',{data:totalP-x.Poissons[index].unitPrice*1})
+                                    setTotalP(totalP-x.Poissons[index].unitPrice*1)}
+                                x.Poissons[index].quantity = Number(Math.max(x.Poissons[index].quantity - 1, 0))
                                 storeData('All',x)
                                 setAll(x)
 
@@ -121,11 +124,46 @@ export default function PoissonsScreen({navigation,route}) {
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity} Kg</Text>
+                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}    x {item.unitPrice}</Text>
                     </View>
                 </View>
-            <View style={{flex:1,alignItems:'center',justifyContent:'space-between',flexDirection:"row",height:"100%"}}>
-                <View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",width:"26%",alignItems:'flex-start',margin:15}}>
+            
+                {item.name==='Poulpe'?<View style={{flex:1,alignItems:'center',justifyContent:'space-between',flexDirection:"row",height:"100%"}}><View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",width:"35%",alignItems:'flex-start',margin:15}}>
+                    <TouchableOpacity onPress={()=>{
+                        let x={...All}
+                        x.Poissons[index].way='Gallega'
+                        storeData('All',x)
+                        setAll(x)
+                    }}>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way==='Gallega'&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way==='Gallega'&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>Gallega</Text>
+                    </TouchableOpacity >
+                    <TouchableOpacity onPress={()=>{
+                        let x={...All}
+                        x.Poissons[index].way='Escabeche'
+                        storeData('All',x)
+                        setAll(x)
+                    }} >
+                        <Text style={{fontWeight:'bold',fontSize:17,textDecorationLine:All.Poissons[index].way==='Escabeche'&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way==='Escabeche'&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>Escabeche</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",margin:15}}>
+                    <TouchableOpacity onPress={()=>{
+                        let x={...All}
+                        x.Poissons[index].way='Ajio'
+                        storeData('All',x)
+                        setAll(x)
+                    }}>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:(All.Poissons[index].way==='Ajio'&&All.Poissons[index].quantity>0)?'underline':'none',color:(All.Poissons[index].way==='Ajio'&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>Ajio</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{
+                        let x={...All}
+                        x.Poissons[index].way='Brasa'
+                        storeData('All',x)
+                        setAll(x)
+                    }}>
+                        <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way==='Brasa'&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way==='Brasa'&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>Brasa</Text>
+                    </TouchableOpacity>
+                </View></View>:<View style={{flex:1,alignItems:'center',justifyContent:'space-between',flexDirection:"row",height:"100%"}}><View style={{flexDirection:'column',justifyContent:'space-between',height:"65%",width:"26%",alignItems:'flex-start',margin:15}}>
                     <TouchableOpacity onPress={()=>{
                         let x={...All}
                         x.Poissons[index].way=ways[0]
@@ -160,8 +198,9 @@ export default function PoissonsScreen({navigation,route}) {
                     }}>
                         <Text style={{fontWeight:'bold',fontSize:18,textDecorationLine:All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0?'underline':'none',color:(All.Poissons[index].way===ways[3]&&All.Poissons[index].quantity>0)?'black':'lightgray'}}>{lang==='fr'?ways[3]:translate(ways[3])}</Text>
                     </TouchableOpacity>
-                </View>
-            </View>
+                </View></View>}
+                
+            
             
         
         </View>

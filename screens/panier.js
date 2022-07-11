@@ -3,9 +3,10 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import * as Network from 'expo-network';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Text,View,TouchableOpacity,ScrollView,Image,ActivityIndicator,StyleSheet} from 'react-native';
+import {Text,View,TouchableOpacity,ScrollView,Image,ActivityIndicator,StyleSheet,TextInput,Alert} from 'react-native';
 import { NativeBaseProvider,Icon,Toast } from 'native-base';
 import { getDatabase, ref, onValue,set,onChildAdded } from 'firebase/database';
+import { storeData } from './dataFunctions';
 
 Notifications.setNotificationHandler({
 handleNotification: async () => ({
@@ -15,22 +16,27 @@ handleNotification: async () => ({
 }),
 });
 async function sendNotif(admins,data){
-    let pdata=data.Poissons.map((item)=>{
-        return item.slice(0,item.length-1)
+   console.log('here')
+        let pdata=data.Poissons.map((item)=>{
+        return {name:item.name,quantity:item.quantity,way:item.way,unitPrice:item.unitPrice}
     })
     let ddata=data.Dessert.map((item)=>{
-        return item.slice(0,item.length-1)
+        return {name:item.name,quantity:item.quantity,unitPrice:item.unitPrice,isSmall:item.isSmall}
     })
     let bdata=data.Boissons.map((item)=>{
-        return item.slice(0,item.length-1)
+        return {name:item.name,quantity:item.quantity,unitPrice:item.unitPrice}
     })
     let edata=data.Entrees.map((item)=>{
-        return item.slice(0,item.length-1)
+        console.log(item.name,'is',item.isSmall)
+        return {name:item.name,quantity:item.quantity,unitPrice:item.unitPrice,isSmall:item.isSmall}
     })
-    
     admins.map(async function(expoPushToken){
     // console.log('token=',expoPushToken)
-    sendSpecificNotificiation(expoPushToken,{Poissons:pdata,Boissons:bdata,Entrees:edata,Dessert:ddata})})
+    sendSpecificNotificiation(expoPushToken,{Poissons:pdata,Boissons:bdata,Entrees:edata,Dessert:ddata,num:data.num})
+})
+    
+    
+    
 }
 async function sendSpecificNotificiation(expoPushToken,data) {
     const message = {
@@ -50,6 +56,7 @@ async function sendSpecificNotificiation(expoPushToken,data) {
       },
       body: JSON.stringify(message),
     });
+    console.log('done')
   }
 
 export default function Panier({navigation,route}){
@@ -68,6 +75,8 @@ export default function Panier({navigation,route}){
     const [admins,setAdmins]=React.useState([])
     const [credit,setCredit]=React.useState(null)
     const [sent, setSent] = React.useState(false);
+    const [staticAll,setStaticAll]=React.useState({})
+    const [table,setTable]=React.useState('')
     React.useEffect(()=>{
         
         const setupHighscoreListener=() =>{const db = getDatabase();
@@ -99,9 +108,16 @@ export default function Panier({navigation,route}){
                         
                         }
                 })
+                await AsyncStorage.getItem('staticAll').then((value)=>{
+                    if (value){
+                        console.log('static' ,JSON.parse(value))
+                        setStaticAll(JSON.parse(value))
+                        
+                        }
+                })
                 await AsyncStorage.getItem('num').then((value)=>{
                     if (value){
-                        // console.log(JSON.parse(value))
+                        // console.log('num=',JSON.parse(value))
                         setNum(JSON.parse(value))
                         }
                 })
@@ -161,7 +177,7 @@ export default function Panier({navigation,route}){
                 // if (!showB){setShowB(true)}
                 return<View key={ind} style={{height:110,margin:15,flexDirection:'row',borderWidth:0.5,justifyContent:'flex-start',alignItems:'center'}}>
                 <View>
-                    <Image source={item.pic} style={{width:100,height:100,margin:6}} />
+                    <Image source={item.url&&{uri:item.url}} style={{width:100,height:100,margin:6}} />
                 </View>
                 <View style={{flexDirection:'column',margin:20, flex:1}}>
                     <Text style={{fontWeight:"bold",fontSize:22,marginBottom:10,maxWidth:200}}>{item.quantity}x  {item.name}</Text>
@@ -178,7 +194,7 @@ export default function Panier({navigation,route}){
             // if (!showE){setShowE(true)}
             return<View key={ind} style={{height:110,margin:15,flexDirection:'row',borderWidth:0.5,justifyContent:'flex-start',alignItems:'center'}}>
             <View>
-                <Image source={item.pic} style={{width:100,height:100,margin:6}} />
+                <Image source={item.url&&{uri:item.url}} style={{width:100,height:100,margin:6}} />
             </View>
             <View style={{flexDirection:'column',margin:20, flex:1}}>
                 <Text style={{fontWeight:"bold",fontSize:22,marginBottom:10,maxWidth:200}}>{item.quantity}x  {item.name}</Text>
@@ -196,7 +212,7 @@ let PoissonsArray=Poissons.map((item,ind)=>{
         // if (!showP){setShowP(true)}
         return<View key={ind} style={{height:110,margin:15,flexDirection:'row',borderWidth:0.5,justifyContent:'flex-start',alignItems:'center'}}>
         <View>
-            <Image source={item.pic} style={{width:100,height:100,margin:6}} />
+            <Image source={item.url&&{uri:item.url}} style={{width:100,height:100,margin:6}} />
         </View>
         <View style={{flexDirection:'column',margin:20, flex:1}}>
             <Text style={{fontWeight:"bold",fontSize:22,marginBottom:10,maxWidth:200}}>{item.quantity} Kg - {item.name}</Text>
@@ -214,7 +230,7 @@ let DessertArray=Dessert.map((item,ind)=>{
         
         return<View key={ind} style={{height:110,margin:15,flexDirection:'row',borderWidth:0.5,justifyContent:'flex-start',alignItems:'center'}}>
         <View>
-            <Image source={item.pic} style={{width:100,height:100,margin:6}} />
+            <Image source={item.url&&{uri:item.url}} style={{width:100,height:100,margin:6}} />
         </View>
         <View style={{flexDirection:'column',margin:20, flex:1}}>
             <Text style={{fontWeight:"bold",fontSize:22,marginBottom:10,maxWidth:200}}>{item.quantity}x  {item.name}</Text>
@@ -230,6 +246,7 @@ let DessertArray=Dessert.map((item,ind)=>{
 
     return<ScrollView>
         <NativeBaseProvider>
+            <TextInput style={{width:'90%',height:50,borderWidth:5,alignSelf:'center',textAlign:'center',fontSize:18,fontWeight:'bold'}} value={table} onChangeText={setTable}/>
             <Text style={{fontWeight:'bold',fontSize:25,margin:10}}>{'Poissons :'.repeat(totalP>0)}</Text>
             <View>{PoissonsArray}</View>
 
@@ -250,22 +267,38 @@ let DessertArray=Dessert.map((item,ind)=>{
 
         <TouchableOpacity onPress={async function(){
             const netObj=await Network.getNetworkStateAsync();
-            if(netObj.isConnected&&netObj.isInternetReachable){
-                if (num===''){
-                navigation.navigate('Sign up')
+            if (table===''){
+                Alert.alert('Entrer le numéro de table')
             }else{
-                if (!sent){
-                    sendNotif(admins,{...All,num:num})
-                    setSent(true)
-                    // Toast.show({})
-                    AsyncStorage.removeItem('All')
-                    navigation.navigate('Home')
+            try{
+                x=parseFloat(table)
+                if(netObj.isConnected&&netObj.isInternetReachable){
+                    if (num===''){
+                    navigation.navigate('Sign up')
+                }else{
+                    // console.log(admins)
+                    if (!sent){
+                        sendNotif(admins,{...All,num:num,table:table})
+                        storeData('All',staticAll)
+                          storeData('totalP', { data: 0 })
+                          storeData('totalD', { data: 0 })
+                          storeData('totalB', { data: 0 })
+                          storeData('totalE', { data: 0 })
+                          setSent(true)
+                        navigation.navigate('Home')
+                    }
+                }
+                }else{
+                    Alert.alert(lang==='fr'?'Erreur Internet':'مشكلة انترنيت',lang==='fr'?"Il y'avais une problème de connexion Internet":" توجد مشكلة انترنيت")
                 }
             }
-            }else{
-                Alert.alert(lang==='fr'?'Erreur Internet':'مشكلة انترنيت',lang==='fr'?"Il y'avais une problème de connexion Internet":" توجد مشكلة انترنيت")
+            catch{
+                Alert.alert('Entrer un numéro valide')
             }
+            
+            
             }}
+        }
         style={[styles.call,{margin:25,alignSelf:'center'}]}>
             <Text style={{fontSize:17,fontWeight:'bold',margin:8}}> ✔ {lang==='fr'?'Réserver':'حجز'}</Text>
         </TouchableOpacity></View>:null}

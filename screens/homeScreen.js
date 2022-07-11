@@ -1,16 +1,19 @@
 import * as React from 'react';
-import { View, ScrollView, Text, TouchableOpacity, Image, StyleSheet, FlatList, ImageBackground, StatusBar,Linking } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, Dimensions, StatusBar, Alert } from 'react-native';
 import { NativeBaseProvider, Icon } from 'native-base';
 import * as NavigationBar from 'expo-navigation-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import * as Dimensions from 'expo-d'
 import { calls } from '../call';
 import { Ionicons } from '@expo/vector-icons';
+import { storeData } from './dataFunctions';
 
 
 
 export default function HomeScreen({navigation,route}) {
     NavigationBar.setVisibilityAsync('hidden')
-    
+    const windowWidth = Dimensions.get('window').width;
+    const windowHeight = Dimensions.get('window').height;
 
 //    if (first){
 //     var font = require('font');
@@ -23,6 +26,7 @@ const [totalE,setTotalE]=React.useState(0)
 const [totalB,setTotalB]=React.useState(0)
 const [totalD,setTotalD]=React.useState(0)
 const [lang,setLang]=React.useState('ar')
+const [modalVisible,setModalVisible]=React.useState(false)
 // console.log('Home')
 
 React.useEffect(()=>{
@@ -91,33 +95,25 @@ React.useEffect(()=>{
 
     ]
     // console.log(Poissons)
-    return <View style={{ flex: 1, justifyContent: "center" }}>
+    return <View style={{ height:'100%',width:'100%', justifyContent: "center" }}>
 <NativeBaseProvider>
-        <View style={{ marginBottom: 0, marginTop: StatusBar.currentHeight ,}}>
+        <View style={{ marginBottom: 0, marginTop: StatusBar.currentHeight ,height:0.35*windowHeight}}>
             {/* <View style={{}}> */}
-                <Image style={styles.image} source={require('../pics/ensalada-de-pulpo.jpg')} />
-
-            {/* </View> */}
-            <View style={styles.headerView}>
-                <Text style={styles.headerTitle}>
-                    Bienvenue à
-                </Text>
-                <Text style={{
-                    fontWeight: "bold",
-                    fontSize: 25,
-                    position: "absolute",
-                    marginTop: 85,
+                <View style={[styles.image,{position:'absolute',height:'50%'}]}>
+                   
+                </View>
+                <View style={{flex:1}}>
+                 <Text style={{textAlign:'center',fontSize:35,fontWeight:'bold',marginTop:10}}>{lang==='fr'?'Bienvenue':'مرحبا بكم'}</Text>
+                    <View style={[styles.headerView,{height:'60%',width:'50%',justifyContent:'center',marginBottom:0,marginTop:10}]}>
                     
-                }}>
-                    AL-Okhtobout
-                </Text>
-                {/* <Image style={[styles.okhto,{
-        transform: [{ rotate: "-10deg" }],
-        borderRadius:20
-      }]} source={require('./Capture.jpg')} /> */}
-            </View>
+                        <Image style={[styles.okhto,{}]} source={require('../pics/logo.jpg')} />
+                    </View>
+</View>
+            {/* </View> */}
+            
         </View>
-        <FlatList horizontal={true} data={titles} style={{ marginBottom: 40 }} keyExtractor={item => item.key} contentContainerStyle={{ padding: 20 }} renderItem={({ item, ind }) => {
+        <View style={{ marginBottom: 40,alignSelf:'center',flex:1}}>
+        <FlatList horizontal={true} data={titles} keyExtractor={item => item.key} contentContainerStyle={{ padding: 20 }} renderItem={({ item, ind }) => {
             let target=null
             switch (item.title){
                 case 'Poissons':
@@ -134,17 +130,15 @@ React.useEffect(()=>{
                 break
                 
             }
-            return <View style={styles.btn}>
+            return <View style={[styles.btn,{width:windowWidth*0.73}]}>
                 <View>
                     <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={target} />
                 </View>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center", width: "100%", marginTop: -100, backgroundColor: 'white', opacity: 0.75, borderBottomLeftRadius:15,borderBottomRightRadius:15 }} />
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center", width: "100%", marginTop: -100 }}>
                     <Text style={styles.title}>{item.title}</Text>
-
-
                 </View>
-                <TouchableOpacity onPress={() => {
+                <TouchableOpacity onPressIn={() => {
                     navigation.navigate(item.title)
                 }}  >
                     
@@ -157,21 +151,40 @@ React.useEffect(()=>{
                 </TouchableOpacity>
             </View>
         }} />
-        
+        </View>
         
         <View style={styles.scrol}>
 
-            <TouchableOpacity onPress={calls} style={[styles.call,{margin:25}]}>
+            <TouchableOpacity onPressIn={calls} style={[styles.call,{margin:25}]}>
                 <Icon as={Ionicons} color='black' name="call" size={5}/>
                 <Text style={{fontSize:17,fontWeight:'bold',margin:8}}>{lang==='fr'?'Réserver':'حجز'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.panier,{margin:25}]} onPress={()=>{
-                    
+            <TouchableOpacity style={[styles.panier,{margin:25}]} onPressIn={()=>{
+                     Alert.alert(
+                        lang==='fr'?'تاكيد':"Confirmation",
+                        lang==='fr'?' تغيير اللغة الى العربية ؟' : "Changer la langue en français ?",
+                        [
+            
+                          { text: lang==='fr'?'لا':"Non", style: "cancel" },
+                          {
+                            text: lang==='fr'?'نعم':"oui",
+                            onPress: () => {
+
+                              if(lang==='fr'){
+                                setLang('ar')
+                                storeData('lang','ar')
+                              }else{
+                                setLang('fr')
+                                storeData('lang','fr')
+                              }
+                          },
+                    }]
+                      )
                 }}>
                 <Icon as={Ionicons} name="settings" size={5}/>
-                <Text style={{fontSize:12,fontWeight:'900',margin:8,textAlign:'center'}}>{lang==='fr'?'Paramètres':'اعدادات'}</Text>
+                <Text style={{fontSize:12,fontWeight:'900',margin:8,textAlign:'center'}}>{lang==='ar'?'Langue':'اللغة'}</Text>
             </TouchableOpacity>
-
+            
         </View>
         </NativeBaseProvider>
     </View>
@@ -184,7 +197,7 @@ const styles = StyleSheet.create({
         width: "98%",
         alignSelf: "center",
         borderRadius: 6,
-        height: 250,
+        height: '40%',
         
         borderBottomWidth:0.5
 
@@ -195,10 +208,8 @@ const styles = StyleSheet.create({
         height: 200,
         alignSelf: "center",
         backgroundColor: "white",
-
         borderRadius: 15,
         alignItems: 'center',
-        marginTop: -130,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -214,16 +225,13 @@ const styles = StyleSheet.create({
         marginTop: 25
     },
     okhto: {
-        position: "absolute",
-        marginTop: 85,
-        marginLeft:10,
-        width:"100%",
-        fontFamily:'AbrilFatface-Regular'
+        width:"90%",
+        height:'90%',
+        alignSelf:'center'
     },
     
     btn: {
         flex: 1,
-        width: 280,
         backgroundColor: "white",
         borderWidth: 0.4,
         borderColor: 'gray',

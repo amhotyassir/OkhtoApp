@@ -77,17 +77,17 @@ export default function EntreesScreen({navigation,route}) {
     
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <FlatList data={All.Entrees} renderItem={({ item, index }) => {
-
+            // console.log('item = ',item)
             return <View><View style={[styles.btn,{ height:100*(item.unitPrice[0]!==item.unitPrice[1])+280,margin: 25,justifyContent:'flex-start'}]}>
                 <View style={styles.btn}>
                     <View>
-                        <Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.pic} />
+                        {item.url?<Image style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} source={item.url&&{uri:item.url}} />:<ActivityIndicator style={{ alignSelf: 'center', width: "100%", height: "100%", borderRadius: 15, alignItems: "center", justifyContent: "center" }} size="large" color="lightblue" />}
                     </View>
 
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100, backgroundColor: 'white', opacity: 0.75, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} />
                     <View style={{ flex: 1, justifyContent: "center", flexDirection: 'column', alignItems: "center", width: "100%", marginTop: -100 }}>
                         <View style={{ flexDirection: 'row', alignContent: 'center', justifyContent: 'space-between', width: "100%",marginTop:-10 }}>
-                            {item.name.substring(0,3)==='Pul'?<View style={{flexDirection:'column'}}><Text style={[styles.title,{fontSize:23,marginLeft:7}]}>Pulpo</Text>
+                            {item.name==='Pul'?<View style={{flexDirection:'column'}}><Text style={[styles.title,{fontSize:23,marginLeft:7}]}>Pulpo</Text>
                             <Text style={[styles.title,{fontSize:23,marginLeft:7,marginTop:-15}]}>{item.name.substring(5)}</Text></View>:item.name.substring(0,3)==='Sal'?<View style={{flexDirection:'column'}}><Text style={[styles.title,{fontSize:23,marginLeft:7}]}>Salade</Text>
                             <Text style={[styles.title,{fontSize:23,marginLeft:7,marginTop:-15}]}>{item.name.substring(6)}</Text></View>:<Text style={[styles.title,{fontSize:23,marginLeft:7}]}>{item.name}</Text>}
                             
@@ -114,7 +114,7 @@ export default function EntreesScreen({navigation,route}) {
                                 <Text style={{ color: 'white', fontSize: 25, textAlign: 'center', alignSelf: 'center' }}>-</Text>
                             </TouchableOpacity>
                         </View>
-                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold',fontSize:20,marginTop:-10*(item.name.length>7)}}>{item.quantity}</Text>
+                        <Text style={{ alignSelf: 'center', textAlign: 'center', fontWeight: 'bold',fontSize:20,marginTop:-10*(item.name.length>7)}}>{item.quantity}       {'x '}{item.unitPrice[0]}</Text>
                     </View>
                 </View>
             <View style={{flex:1,alignItems:'center',justifyContent:'space-between',margin:17,flexDirection:"column"}}>
