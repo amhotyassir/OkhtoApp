@@ -71,10 +71,10 @@ function App() {
         // console.log(JSON.parse( '{"name": "Calamar", "quantity": 0, "unitPrice": 140, "way": "Frit"}'))
         var x
         // console.log(Object.values( snapshot.val().test).map(item=>item))
-        x={Poissons:Object.values( snapshot.val().Poissons).map(item=>typeof(item)==='object'? item: JSON.parse(item)),
-            Boissons:Object.values( snapshot.val().Boissons),
-            Entrees:Object.values( snapshot.val().Entrees).map(item=>JSON.parse(item)),
-            Dessert:Object.values( snapshot.val().Dessert).map(item=>JSON.parse(item))
+        x={Poissons:Object.values( snapshot.val().menu.Poissons).map(item=>typeof(item)==='object'? item: JSON.parse(item)),
+            Boissons:Object.values( snapshot.val().menu.Boissons),
+            Entrees:Object.values( snapshot.val().menu.Entrees).map(item=>JSON.parse(item)),
+            Dessert:Object.values( snapshot.val().menu.Dessert).map(item=>JSON.parse(item))
           }
         storeData('All',x)
         storeData('staticAll',x)
